@@ -72,6 +72,11 @@ module.exports = {
         resourceQuery: { not: [/url/] },
         use: ['@svgr/webpack'],
       },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
+        include: [resolve(__dirname, 'src/index.css')],
+      },
     ],
   },
 };
