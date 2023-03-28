@@ -1,6 +1,7 @@
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
@@ -21,6 +22,30 @@ module.exports = {
         },
         mode: 'write-references',
       },
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: require.resolve('pyodide/repodata.json'),
+          to: 'static/js/repodata.json',
+        },
+        {
+          from: require.resolve('pyodide/pyodide_py.tar'),
+          to: 'static/js/pyodide_py.tar',
+        },
+        {
+          from: require.resolve('pyodide/pyodide.asm.data'),
+          to: 'static/js/pyodide.asm.data',
+        },
+        {
+          from: require.resolve('pyodide/pyodide.asm.js'),
+          to: 'static/js/pyodide.asm.js',
+        },
+        {
+          from: require.resolve('pyodide/pyodide.asm.wasm'),
+          to: 'static/js/pyodide.asm.wasm',
+        },
+      ],
     }),
   ],
   module: {

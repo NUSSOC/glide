@@ -5,6 +5,12 @@ const common = require('./webpack.common');
 
 module.exports = merge(common, {
   mode: 'development',
+  devServer: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
   plugins: [new ReactRefreshWebpackPlugin()],
   module: {
     rules: [
