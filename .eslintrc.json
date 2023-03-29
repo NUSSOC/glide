@@ -1,0 +1,31 @@
+{
+  "extends": "react-app",
+  "plugins": ["simple-import-sort"],
+  "rules": {
+    "react-hooks/exhaustive-deps": "off",
+    "react/jsx-sort-props": [
+      "warn",
+      {
+        "reservedFirst": true
+      }
+    ],
+    "simple-import-sort/imports": [
+      "warn",
+      {
+        "groups": [
+          // Packages. `react` related packages come first.
+          ["^react", "^@?\\w"],
+          // Internal packages.
+          ["^(assets|components|pages|workers)(/.*|$)"],
+          // Side effect imports.
+          ["^\\u0000"],
+          // Parent imports. Put `..` last.
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Other relative imports. Put same-folder imports and `.` behind, and style imports last.
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$", "^.+\\.s?css$"]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "warn"
+  }
+}

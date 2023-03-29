@@ -1,5 +1,6 @@
 const { merge, mergeWithRules } = require('webpack-merge');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 
 const common = require('./webpack.common');
 
@@ -11,7 +12,12 @@ module.exports = merge(common, {
       'Cross-Origin-Embedder-Policy': 'require-corp',
     },
   },
-  plugins: [new ReactRefreshWebpackPlugin()],
+  plugins: [
+    new ReactRefreshWebpackPlugin(),
+    new ESLintWebpackPlugin({
+      extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
+    }),
+  ],
   module: {
     rules: [
       mergeWithRules({
