@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .windowed {
+    @apply relative overflow-hidden rounded-lg ring-2 ring-slate-700;
+  }
+}
+
+.gutter.gutter-horizontal {
+  @apply cursor-col-resize;
+}
+
+.gutter.gutter-vertical {
+  @apply cursor-row-resize;
+}
+
+.xterm {
+  @apply px-2 pb-11 pt-2;
+}
+
+kbd {
+  @apply rounded bg-slate-600 px-1 font-sans font-semibold text-white;
+}

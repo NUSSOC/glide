@@ -8,9 +8,20 @@
     "build": "webpack --config webpack.prod.js"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.13",
+    "@heroicons/react": "^2.0.16",
+    "@monaco-editor/react": "^4.4.6",
+    "@reduxjs/toolkit": "^1.9.3",
+    "monaco-editor": "^0.36.1",
     "pyodide": "^0.22.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
+    "react-split": "^2.0.14",
+    "redux-persist": "^6.0.0",
+    "xterm": "^5.1.0",
+    "xterm-addon-fit": "^0.7.0",
+    "xterm-addon-webgl": "^0.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
