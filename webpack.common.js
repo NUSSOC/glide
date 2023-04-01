@@ -27,23 +27,23 @@ module.exports = {
       patterns: [
         {
           from: require.resolve('pyodide/repodata.json'),
-          to: 'static/js/repodata.json',
+          to: 'repodata.json',
         },
         {
           from: require.resolve('pyodide/pyodide_py.tar'),
-          to: 'static/js/pyodide_py.tar',
+          to: 'pyodide_py.tar',
         },
         {
           from: require.resolve('pyodide/pyodide.asm.data'),
-          to: 'static/js/pyodide.asm.data',
+          to: 'pyodide.asm.data',
         },
         {
           from: require.resolve('pyodide/pyodide.asm.js'),
-          to: 'static/js/pyodide.asm.js',
+          to: 'pyodide.asm.js',
         },
         {
           from: require.resolve('pyodide/pyodide.asm.wasm'),
-          to: 'static/js/pyodide.asm.wasm',
+          to: 'pyodide.asm.wasm',
         },
       ],
     }),
