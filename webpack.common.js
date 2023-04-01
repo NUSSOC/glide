@@ -75,7 +75,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader', 'postcss-loader'],
-        include: [resolve(__dirname, 'src/index.css')],
+      },
+      {
+        test: /\.py$/,
+        type: 'asset/source',
       },
     ],
   },
