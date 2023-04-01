@@ -6,6 +6,7 @@ const common = require('./webpack.common');
 
 module.exports = merge(common, {
   mode: 'development',
+  devtool: 'cheap-module-source-map',
   devServer: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
