@@ -39,6 +39,11 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
         const content = ref.current?.getValue();
         if (content !== undefined) props.onSave(content);
       }
+
+      if (e.key === 'F5') {
+        e.preventDefault();
+        runCode();
+      }
     };
 
     window.addEventListener('keydown', handleShortcut);
