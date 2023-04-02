@@ -14,6 +14,7 @@ interface UseFilesMutationsHook {
   draft: (autoSelect?: boolean) => void;
   select: (name: string) => void;
   update: (content: string) => void;
+  create: (name: string, content: string) => void;
 }
 
 const useFilesMutations = (): UseFilesMutationsHook => {
@@ -45,6 +46,9 @@ const useFilesMutations = (): UseFilesMutationsHook => {
     },
     update: (content: string) => {
       dispatch(filesActions.updateSelected(content));
+    },
+    create: (name: string, content: string) => {
+      dispatch(filesActions.create({ name, content }));
     },
   };
 };

@@ -52,6 +52,21 @@ export const filesSlice = createSlice({
       const select = action.payload;
       if (select) state.selected = name;
     },
+    create: (
+      state,
+      action: PayloadAction<{ name: string; content: string }>,
+    ) => {
+      const { name, content } = action.payload;
+      const newName = findSuitableName(
+        name,
+        state.list,
+        (counter) => `Copy${counter ? ` ${counter}` : ''} of ${name}`,
+      );
+
+      state.files[newName] = content;
+      state.list.push(newName);
+      state.selected = newName;
+    },
     updateSelected: (state, action: PayloadAction<string>) => {
       if (state.selected === undefined) return;
 

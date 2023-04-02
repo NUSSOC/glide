@@ -7,6 +7,7 @@ import useFilesMutations from '../hooks/useFilesMutations';
 
 import Button from './Button';
 import FileItem from './FileItem';
+import FileUploader from './FileUploader';
 
 interface LibraryProps {
   open: boolean;
@@ -16,7 +17,7 @@ interface LibraryProps {
 const Library = (props: LibraryProps): JSX.Element => {
   const files = useFile.NamesWithUnsaved();
 
-  const { draft } = useFilesMutations();
+  const { draft, create } = useFilesMutations();
 
   return (
     <Transition appear as={Fragment} show={props.open}>
@@ -79,7 +80,17 @@ const Library = (props: LibraryProps): JSX.Element => {
                   >
                     New File
                   </Button>
-                  <Button icon={ArrowUpTrayIcon}>Upload</Button>
+
+                  <FileUploader
+                    icon={ArrowUpTrayIcon}
+                    onUpload={(name, content) => {
+                      if (content === null) return;
+                      create(name, content);
+                      props.onClose();
+                    }}
+                  >
+                    Upload
+                  </FileUploader>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
