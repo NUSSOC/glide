@@ -21,35 +21,32 @@ interface CoreEditorProps extends EditorProps {
 }
 
 const CoreEditor = (props: CoreEditorProps): JSX.Element => {
-  const { dependsOn: dependency } = props;
-
   const ref = useRef<editor.IStandaloneCodeEditor>();
 
+  const handleShortcut = (e: KeyboardEvent) => {
+    const isCmdSInMac =
+      navigator.platform.startsWith('Mac') && e.metaKey && e.key === 's';
+
+    const isCtrlSInWindows =
+      navigator.platform === 'Win32' && e.ctrlKey && e.key === 's';
+
+    if (isCmdSInMac || isCtrlSInWindows) {
+      e.preventDefault();
+
+      const content = ref.current?.getValue();
+      if (content !== undefined) props.onSave(content);
+    }
+
+    if (e.key === 'F5') {
+      e.preventDefault();
+      runCode();
+    }
+  };
+
   useEffect(() => {
-    const handleShortcut = (e: KeyboardEvent) => {
-      const isCmdSInMac =
-        navigator.platform.startsWith('Mac') && e.metaKey && e.key === 's';
-
-      const isCtrlSInWindows =
-        navigator.platform === 'Win32' && e.ctrlKey && e.key === 's';
-
-      if (isCmdSInMac || isCtrlSInWindows) {
-        e.preventDefault();
-
-        const content = ref.current?.getValue();
-        if (content !== undefined) props.onSave(content);
-      }
-
-      if (e.key === 'F5') {
-        e.preventDefault();
-        runCode();
-      }
-    };
-
     window.addEventListener('keydown', handleShortcut);
-
     return () => window.removeEventListener('keydown', handleShortcut);
-  }, [dependency]);
+  }, [handleShortcut]);
 
   const runCode = () => {
     props.onRunCode?.(ref.current?.getValue() ?? '');
