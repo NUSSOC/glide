@@ -33,13 +33,14 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
       callbacks[event.data.type]?.(event.data.payload);
     };
 
-    // TODO: Check if SharedArrayBuffer is supported. If not, just restart Pyodide.
-    const interruptBuffer = new Uint8Array(new SharedArrayBuffer(1));
-    interruptBufferRef.current = interruptBuffer;
-    worker.postMessage({
-      type: 'setInterruptBuffer',
-      payload: interruptBuffer,
-    });
+    let interruptBuffer: Uint8Array | null = null;
+
+    if (typeof SharedArrayBuffer !== 'undefined') {
+      interruptBuffer = new Uint8Array(new SharedArrayBuffer(1));
+      interruptBufferRef.current = interruptBuffer;
+    }
+
+    worker.postMessage({ type: 'initialize', payload: interruptBuffer });
 
     workerRef.current = worker;
   };
@@ -64,9 +65,13 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
       });
     },
     stop: () => {
-      if (!interruptBufferRef.current) return;
-      interruptBufferRef.current[0] = 2;
-      workerRef.current?.postMessage({ type: 'replClear' });
+      if (interruptBufferRef.current) {
+        interruptBufferRef.current[0] = 2;
+        workerRef.current?.postMessage({ type: 'replClear' });
+      } else {
+        workerRef.current?.terminate();
+        setUpInterpreterWorker();
+      }
     },
     execute: (code) => {
       resetInterruptBuffer();

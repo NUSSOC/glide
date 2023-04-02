@@ -87,9 +87,9 @@ const prepareExports = (exports?: { name: string; content: string }[]) => {
 };
 
 const listeners = {
-  setInterruptBuffer: async (interruptBuffer: Uint8Array) => {
+  initialize: async (interruptBuffer?: Uint8Array) => {
     pyodide ??= await preparePyodide();
-    pyodide.setInterruptBuffer(interruptBuffer);
+    if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
   },
 
   run: async ({ code, exports }: RunExportableData) => {
