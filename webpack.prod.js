@@ -1,5 +1,7 @@
+const { resolve } = require('path');
 const zlib = require('zlib');
 const CompressionPlugin = require('compression-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const { merge } = require('webpack-merge');
 
 const common = require('./webpack.common');
@@ -21,6 +23,9 @@ module.exports = merge(common, {
         },
       },
       threshold: 10240,
+    }),
+    new CopyPlugin({
+      patterns: [resolve(__dirname, 'public/_headers')],
     }),
   ],
 });
