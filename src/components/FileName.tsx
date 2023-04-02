@@ -19,12 +19,12 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
 
   return !editing ? (
     <div
-      className="rounded-lg p-2 hover:bg-slate-800"
-      onClick={() => {
-        setEditing(true);
-      }}
+      className="min-w-0 rounded-lg p-2 hover:bg-slate-800"
+      onClick={() => setEditing(true)}
     >
-      <p className="text-md">{props.initialValue}</p>
+      <p className="text-md overflow-hidden overflow-ellipsis whitespace-nowrap">
+        {props.initialValue}
+      </p>
     </div>
   ) : (
     <input
@@ -68,7 +68,7 @@ const FileName = (props: FileNameProps): JSX.Element => {
   const { rename } = useFilesMutations();
 
   return (
-    <div className="flex items-center space-x-3">
+    <div className="flex min-w-0 items-center space-x-3">
       <RenamableInput
         initialValue={name ?? ''}
         onConfirm={(newName) => {

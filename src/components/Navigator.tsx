@@ -14,8 +14,6 @@ const Navigator = (): JSX.Element => {
         <FileName />
 
         <div className="flex flex-row items-center space-x-2">
-          <Item className="text-slate-400">Save</Item>
-
           <Item
             className="text-slate-400"
             icon={BuildingLibraryIcon}
