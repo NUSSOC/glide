@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { PlayIcon } from '@heroicons/react/24/outline';
 import MonacoEditor from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
@@ -74,6 +74,10 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 const Editor = (props: EditorProps): JSX.Element | null => {
   const { update, save } = useFilesMutations();
   const { name, content } = useFile.Selected();
+
+  useLayoutEffect(() => {
+    document.title = `${name ? `${name} | ` : ''}Glide`;
+  }, [name]);
 
   if (name === undefined || content === undefined) return null;
 
