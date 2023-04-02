@@ -13,44 +13,44 @@ interface EditorProps {
   onRunCode?: (code: string) => void;
 }
 
-const Editor = (props: EditorProps): JSX.Element | null => {
+interface CoreEditorProps extends EditorProps {
+  onSave: (content: string) => void;
+  onChange: (value: string) => void;
+  value: string;
+  dependsOn?: string;
+}
+
+const CoreEditor = (props: CoreEditorProps): JSX.Element => {
+  const { dependsOn: dependency } = props;
+
   const ref = useRef<editor.IStandaloneCodeEditor>();
-
-  const { update, save } = useFilesMutations();
-
-  const { name, content } = useAppSelector(getSelectedFile);
-
-  const runCode = () => {
-    props.onRunCode?.(ref.current?.getValue() ?? '');
-  };
-
-  const saveFile = () => {
-    console.log(name);
-    if (!name) return;
-
-    const currentContent = ref.current?.getValue() ?? '';
-    save(name, currentContent);
-  };
 
   useEffect(() => {
     const handleShortcut = (e: KeyboardEvent) => {
       if (e.metaKey && e.key === 's') {
-        console.log('kepencet');
         e.preventDefault();
-        saveFile();
+
+        const content = ref.current?.getValue();
+        if (content !== undefined) props.onSave(content);
       }
     };
 
     window.addEventListener('keydown', handleShortcut);
 
     return () => window.removeEventListener('keydown', handleShortcut);
-  }, [name]);
+  }, [dependency]);
+
+  const runCode = () => {
+    props.onRunCode?.(ref.current?.getValue() ?? '');
+  };
 
   return (
     <section className="windowed h-full w-full">
       <MonacoEditor
         defaultLanguage="python"
-        onChange={(value) => (value !== undefined ? update(value) : null)}
+        onChange={(value) =>
+          value !== undefined ? props.onChange(value) : null
+        }
         onMount={(editor) => (ref.current = editor)}
         options={{
           fontSize: 14,
@@ -60,7 +60,7 @@ const Editor = (props: EditorProps): JSX.Element | null => {
           minimap: { enabled: false },
         }}
         theme="vs-dark"
-        value={content}
+        value={props.value}
       />
 
       <div className="absolute bottom-3 right-3 space-x-2">
@@ -69,6 +69,23 @@ const Editor = (props: EditorProps): JSX.Element | null => {
         </Button>
       </div>
     </section>
+  );
+};
+
+const Editor = (props: EditorProps): JSX.Element | null => {
+  const { update, save } = useFilesMutations();
+  const { name, content } = useAppSelector(getSelectedFile);
+
+  if (name === undefined || content === undefined) return null;
+
+  return (
+    <CoreEditor
+      {...props}
+      dependsOn={name}
+      onChange={update}
+      onSave={(newContent) => save(name, newContent)}
+      value={content}
+    />
   );
 };
 
