@@ -27,7 +27,13 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 
   useEffect(() => {
     const handleShortcut = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === 's') {
+      const isCmdSInMac =
+        navigator.platform.startsWith('Mac') && e.metaKey && e.key === 's';
+
+      const isCtrlSInWindows =
+        navigator.platform === 'Win32' && e.ctrlKey && e.key === 's';
+
+      if (isCmdSInMac || isCtrlSInWindows) {
         e.preventDefault();
 
         const content = ref.current?.getValue();
