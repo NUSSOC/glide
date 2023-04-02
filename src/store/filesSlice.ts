@@ -14,14 +14,39 @@ const initialState: FilesState = {
   list: [],
 };
 
+const findSuitableName = (
+  name: string,
+  list: string[],
+  transformer: (counter: number) => string,
+) => {
+  const names = new Set(list);
+  let counter = 0;
+  let newName = name;
+
+  while (names.has(newName)) {
+    newName = transformer(counter);
+
+    counter += 1;
+  }
+
+  return newName;
+};
+
 export const filesSlice = createSlice({
   name: 'files',
   initialState,
   reducers: {
     rehydrate: (_, action: PayloadAction<FilesState>) => action.payload,
-    create: (state, action: PayloadAction<boolean | undefined>) => {
-      const name = `untitled-${state.list.length + 1}.py`;
-      state.files[name] = name;
+    draft: (state, action: PayloadAction<boolean | undefined>) => {
+      const name = findSuitableName(
+        'untitled.py',
+        state.list,
+        (counter) => `untitled-${counter + 1}.py`,
+      );
+
+      console.log(name);
+
+      state.files[name] = '';
       state.list.push(name);
 
       const select = action.payload;

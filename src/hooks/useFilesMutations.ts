@@ -38,7 +38,7 @@ const useFilesMutations = (): UseFilesMutationsHook => {
       persistor.flush();
     },
     draft: (autoSelect?: boolean) => {
-      dispatch(filesActions.create(autoSelect));
+      dispatch(filesActions.draft(autoSelect));
     },
     select: (name: string) => {
       dispatch(filesActions.select(name));

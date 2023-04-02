@@ -73,7 +73,7 @@ const Library = (props: LibraryProps): JSX.Element => {
                   <Button
                     icon={PlusIcon}
                     onClick={() => {
-                      draft();
+                      draft(true);
                       props.onClose();
                     }}
                   >
