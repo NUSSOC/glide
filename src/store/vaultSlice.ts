@@ -28,7 +28,7 @@ export const vaultSlice = createSlice({
       if (!state.files[name]) state.list.push(name);
       state.files[name] = content;
     },
-    delete: (state, action: PayloadAction<string>) => {
+    destroy: (state, action: PayloadAction<string>) => {
       const name = action.payload;
       delete state.files[name];
       state.list = state.list.filter((file) => file !== name);

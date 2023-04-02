@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Transition } from '@headlessui/react';
 
-import { persistor } from '../store';
-import { filesActions, getSelectedFileName } from '../store/filesSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { vaultActions } from '../store/vaultSlice';
+import useFilesMutations from '../hooks/useFilesMutations';
+import { getSelectedFileName } from '../store/filesSlice';
+import { useAppSelector } from '../store/hooks';
 
 import UnsavedBadge from './UnsavedBadge';
 
@@ -78,7 +77,7 @@ const FileName = (props: FileNameProps): JSX.Element => {
     ({ files, vault }) => new Set(files.list.concat(vault.list)),
   );
 
-  const dispatch = useAppDispatch();
+  const { rename } = useFilesMutations();
 
   return (
     <div className="flex items-center space-x-3">
@@ -88,13 +87,7 @@ const FileName = (props: FileNameProps): JSX.Element => {
           if (!selectedFileName) return;
           if (existingFileNames.has(newName)) return;
 
-          dispatch(
-            filesActions.rename({ from: selectedFileName, to: newName }),
-          );
-          dispatch(
-            vaultActions.rename({ from: selectedFileName, to: newName }),
-          );
-          persistor.flush();
+          rename(selectedFileName, newName);
         }}
       />
 

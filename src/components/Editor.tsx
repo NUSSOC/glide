@@ -3,10 +3,9 @@ import { PlayIcon } from '@heroicons/react/24/outline';
 import MonacoEditor from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
 
-import { persistor } from '../store';
-import { filesActions, getSelectedFile } from '../store/filesSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { vaultActions } from '../store/vaultSlice';
+import useFilesMutations from '../hooks/useFilesMutations';
+import { getSelectedFile } from '../store/filesSlice';
+import { useAppSelector } from '../store/hooks';
 
 import Button from './Button';
 
@@ -17,7 +16,7 @@ interface EditorProps {
 const Editor = (props: EditorProps): JSX.Element | null => {
   const ref = useRef<editor.IStandaloneCodeEditor>();
 
-  const dispatch = useAppDispatch();
+  const { update, save } = useFilesMutations();
 
   const { name, content } = useAppSelector(getSelectedFile);
 
@@ -25,14 +24,12 @@ const Editor = (props: EditorProps): JSX.Element | null => {
     props.onRunCode?.(ref.current?.getValue() ?? '');
   };
 
-  const save = () => {
+  const saveFile = () => {
     console.log(name);
     if (!name) return;
 
     const currentContent = ref.current?.getValue() ?? '';
-    dispatch(filesActions.updateSelected(currentContent));
-    dispatch(vaultActions.save({ name, content: currentContent }));
-    persistor.flush();
+    save(name, currentContent);
   };
 
   useEffect(() => {
@@ -40,7 +37,7 @@ const Editor = (props: EditorProps): JSX.Element | null => {
       if (e.metaKey && e.key === 's') {
         console.log('kepencet');
         e.preventDefault();
-        save();
+        saveFile();
       }
     };
 
@@ -53,9 +50,7 @@ const Editor = (props: EditorProps): JSX.Element | null => {
     <section className="windowed h-full w-full">
       <MonacoEditor
         defaultLanguage="python"
-        onChange={(value) => {
-          dispatch(filesActions.updateSelected(value ?? ''));
-        }}
+        onChange={(value) => (value !== undefined ? update(value) : null)}
         onMount={(editor) => (ref.current = editor)}
         options={{
           fontSize: 14,

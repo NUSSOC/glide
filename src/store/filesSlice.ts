@@ -32,7 +32,7 @@ export const filesSlice = createSlice({
 
       state.files[state.selected] = action.payload;
     },
-    delete: (state, action: PayloadAction<string>) => {
+    destroy: (state, action: PayloadAction<string>) => {
       const name = action.payload;
       delete state.files[name];
       state.list = state.list.filter((file) => file !== name);

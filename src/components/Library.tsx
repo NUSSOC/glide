@@ -2,8 +2,8 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline';
 
-import { filesActions } from '../store/filesSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import useFilesMutations from '../hooks/useFilesMutations';
+import { useAppSelector } from '../store/hooks';
 
 import Button from './Button';
 import FileItem from './FileItem';
@@ -23,7 +23,7 @@ const Library = (props: LibraryProps): JSX.Element => {
     }),
   );
 
-  const dispatch = useAppDispatch();
+  const { draft } = useFilesMutations();
 
   return (
     <Transition appear as={Fragment} show={props.open}>
@@ -80,7 +80,7 @@ const Library = (props: LibraryProps): JSX.Element => {
                   <Button
                     icon={PlusIcon}
                     onClick={() => {
-                      dispatch(filesActions.create(true));
+                      draft();
                       props.onClose();
                     }}
                   >

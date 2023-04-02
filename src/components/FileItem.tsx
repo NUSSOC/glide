@@ -1,9 +1,6 @@
 import { ArrowRightIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-import { persistor } from '../store';
-import { filesActions } from '../store/filesSlice';
-import { useAppDispatch } from '../store/hooks';
-import { vaultActions } from '../store/vaultSlice';
+import useFilesMutations from '../hooks/useFilesMutations';
 
 import UnsavedBadge from './UnsavedBadge';
 
@@ -14,14 +11,14 @@ interface FileItemProps {
 }
 
 const FileItem = (props: FileItemProps): JSX.Element => {
-  const dispatch = useAppDispatch();
+  const { select, destroy } = useFilesMutations();
 
   return (
     <div className="flex items-center space-x-2">
       <div
         className="group flex w-full min-w-0 select-none flex-row items-center justify-between rounded-lg bg-slate-700 p-3 text-slate-100 transition-transform hover:bg-slate-600 active:scale-95"
         onClick={() => {
-          dispatch(filesActions.select(props.name));
+          select(props.name);
           props.onClick?.();
         }}
         role="button"
@@ -42,11 +39,7 @@ const FileItem = (props: FileItemProps): JSX.Element => {
 
       <div
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600/20 text-red-400 transition-transform hover:scale-110 active:scale-95"
-        onClick={() => {
-          dispatch(filesActions.delete(props.name));
-          dispatch(vaultActions.delete(props.name));
-          persistor.flush();
-        }}
+        onClick={() => destroy(props.name)}
         role="button"
       >
         <TrashIcon className="h-5" />

@@ -4,12 +4,9 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline';
 
-import {
-  filesActions,
-  getFileNames,
-  getSelectedFileName,
-} from '../store/filesSlice';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import useFilesMutations from '../hooks/useFilesMutations';
+import { getFileNames, getSelectedFileName } from '../store/filesSlice';
+import { useAppSelector } from '../store/hooks';
 
 import Item from './Item';
 
@@ -18,7 +15,7 @@ interface ExplorerProps {
 }
 
 const Explorer = (props: ExplorerProps): JSX.Element => {
-  const dispatch = useAppDispatch();
+  const { select } = useFilesMutations();
   const fileNames = useAppSelector(getFileNames);
 
   const selectedFileName = useAppSelector(getSelectedFileName);
@@ -31,7 +28,7 @@ const Explorer = (props: ExplorerProps): JSX.Element => {
             key={fileName}
             icon={DocumentTextIcon}
             iconClassName="text-sky-200"
-            onClick={() => dispatch(filesActions.select(fileName))}
+            onClick={() => select(fileName)}
             selected={selectedFileName === fileName}
           >
             {fileName}
