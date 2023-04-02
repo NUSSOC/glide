@@ -54,7 +54,7 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       const xterm = new Xterm({
         cursorBlink: false,
         cursorStyle: 'underline',
-        fontFamily: 'JetBrains Mono',
+        fontFamily: 'monospace',
         fontSize: 14,
         theme: { background: slate[900], cursor: yellow[400] },
         disableStdin: true,

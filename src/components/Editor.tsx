@@ -65,7 +65,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
         onMount={(editor) => (ref.current = editor)}
         options={{
           fontSize: 14,
-          fontFamily: 'JetBrains Mono',
+          fontFamily: 'monospace',
           smoothScrolling: true,
           cursorSmoothCaretAnimation: 'on',
           minimap: { enabled: false },
