@@ -109,7 +109,7 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
               props.onCtrlC?.();
               xtermRef.current?.scrollToBottom();
             }}
-            onMetaR={() => {
+            onF2={() => {
               xtermRef.current?.clear();
             }}
             onReturn={(input) => {

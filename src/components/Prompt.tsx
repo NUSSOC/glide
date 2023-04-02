@@ -4,7 +4,7 @@ import { ChevronRightIcon } from '@heroicons/react/24/outline';
 interface PromptProps {
   onCtrlC?: () => void;
   onReturn?: (command: string) => void;
-  onMetaR?: () => void;
+  onF2?: () => void;
 }
 
 const Prompt = (props: PromptProps): JSX.Element => {
@@ -18,8 +18,8 @@ const Prompt = (props: PromptProps): JSX.Element => {
         {!command.length && (
           <div className="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center overflow-hidden">
             <p className="overflow-ellipsis whitespace-nowrap text-sm opacity-50">
-              Python commands go here! <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop
-              code execution. <kbd>⌘ R</kbd> to clear the console.
+              Python commands go here! <kbd>Ctrl</kbd>+<kbd>C</kbd> stops
+              execution. <kbd>F2</kbd> clears the console.
             </p>
           </div>
         )}
@@ -45,9 +45,9 @@ const Prompt = (props: PromptProps): JSX.Element => {
               setCommand('');
             }
 
-            if (e.metaKey && e.key === 'r') {
+            if (e.key === 'F2') {
               e.preventDefault();
-              props.onMetaR?.();
+              props.onF2?.();
             }
           }}
           value={command}
