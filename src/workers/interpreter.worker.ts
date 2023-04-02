@@ -82,8 +82,6 @@ const prepareExports = (exports?: { name: string; content: string }[]) => {
 
     pyodide.FS.unlink(name);
   });
-
-  console.log(pyodide.FS.readdir('.'));
 };
 
 const listeners = {

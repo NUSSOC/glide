@@ -51,8 +51,6 @@ export const filesSlice = createSlice({
         (counter) => `untitled-${counter + 1}.py`,
       );
 
-      console.log(name);
-
       state.files[name] = '';
       state.list.push(name);
 
@@ -93,8 +91,8 @@ export const filesSlice = createSlice({
     },
     rename: (state, action: PayloadAction<{ from: string; to: string }>) => {
       const { from: oldName, to: newName } = action.payload;
-      const isOldNameExist = Boolean(state.files[oldName]);
-      const isNewNameExist = Boolean(state.files[newName]);
+      const isOldNameExist = state.files[oldName] !== undefined;
+      const isNewNameExist = state.files[newName] !== undefined;
       if (!isOldNameExist || isNewNameExist) return;
 
       state.files[newName] = state.files[oldName];

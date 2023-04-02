@@ -25,7 +25,7 @@ export const vaultSlice = createSlice({
     save: (state, action: PayloadAction<File>) => {
       const { name, content } = action.payload;
 
-      if (!state.files[name]) state.list.push(name);
+      if (state.files[name] === undefined) state.list.push(name);
       state.files[name] = content;
     },
     destroy: (state, action: PayloadAction<string>) => {
@@ -35,8 +35,8 @@ export const vaultSlice = createSlice({
     },
     rename: (state, action: PayloadAction<{ from: string; to: string }>) => {
       const { from: oldName, to: newName } = action.payload;
-      const isOldNameExist = Boolean(state.files[oldName]);
-      const isNewNameExist = Boolean(state.files[newName]);
+      const isOldNameExist = state.files[oldName] !== undefined;
+      const isNewNameExist = state.files[newName] !== undefined;
       if (!isOldNameExist || isNewNameExist) return;
 
       state.files[newName] = state.files[oldName];
