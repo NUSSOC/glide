@@ -1,5 +1,11 @@
-import { ArrowRightIcon, TrashIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowRightIcon,
+  CubeIcon as OutlineCubeIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
+import { CubeIcon as SolidCubeIcon } from '@heroicons/react/24/solid';
 
+import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
 
 import UnsavedBadge from './UnsavedBadge';
@@ -11,7 +17,9 @@ interface FileItemProps {
 }
 
 const FileItem = (props: FileItemProps): JSX.Element => {
-  const { select, destroy } = useFilesMutations();
+  const { select, destroy, toggleExport } = useFilesMutations();
+
+  const exported = useFile.Exported(props.name);
 
   return (
     <div className="flex items-center space-x-2">
@@ -35,6 +43,20 @@ const FileItem = (props: FileItemProps): JSX.Element => {
             <ArrowRightIcon className="h-4" />
           </div>
         </div>
+      </div>
+
+      <div
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform hover:scale-110 active:scale-95 ${
+          exported ? 'bg-blue-600/30' : 'bg-blue-600/10'
+        }`}
+        onClick={() => toggleExport(props.name)}
+        role="button"
+      >
+        {exported ? (
+          <SolidCubeIcon className="h-5 text-blue-400" />
+        ) : (
+          <OutlineCubeIcon className="h-5 text-blue-400" />
+        )}
       </div>
 
       <div

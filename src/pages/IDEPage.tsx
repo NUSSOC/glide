@@ -4,15 +4,19 @@ import Split from 'react-split';
 import Editor from '../components/Editor';
 import Navigator from '../components/Navigator';
 import Terminal from '../components/Terminal';
+import useFile from '../hooks/useFile';
 import useInterpreter from '../hooks/useInterpreter';
 
 const IDEPage = (): JSX.Element => {
   const consoleRef = useRef<ComponentRef<typeof Terminal>>(null);
 
+  const exports = useFile.Exports();
+
   const interpreter = useInterpreter({
     write: (text: string) => consoleRef.current?.write(text),
     writeln: (text: string) => consoleRef.current?.append(text),
     error: (text: string) => consoleRef.current?.error(text),
+    exports: () => exports,
   });
 
   return (

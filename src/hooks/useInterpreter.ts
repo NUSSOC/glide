@@ -10,6 +10,7 @@ interface Callbacks {
   write: (text: string) => void;
   writeln: (text: string) => void;
   error: (text: string) => void;
+  exports?: () => { name: string; content: string }[];
 }
 
 interface Message<L extends Record<string, any>> {
@@ -55,16 +56,22 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
   return {
     run: (code) => {
       resetInterruptBuffer();
-      workerRef.current?.postMessage({ type: 'run', payload: code });
+      workerRef.current?.postMessage({
+        type: 'run',
+        payload: { code, exports: callbacks.exports?.() },
+      });
     },
     stop: () => {
       if (!interruptBufferRef.current) return;
       interruptBufferRef.current[0] = 2;
       workerRef.current?.postMessage({ type: 'replClear' });
     },
-    execute: (command) => {
+    execute: (code) => {
       resetInterruptBuffer();
-      workerRef.current?.postMessage({ type: 'replInput', payload: command });
+      workerRef.current?.postMessage({
+        type: 'replInput',
+        payload: { code, exports: callbacks.exports?.() },
+      });
     },
   };
 };

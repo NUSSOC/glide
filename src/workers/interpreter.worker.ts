@@ -18,6 +18,11 @@ interface Message<T extends Record<string, unknown>> {
   payload: any;
 }
 
+interface RunExportableData {
+  code: string;
+  exports?: { name: string; content: string }[];
+}
+
 let pyodide: PyodideInterface;
 let waiting = false;
 
@@ -62,19 +67,37 @@ const preparePyodide = async () => {
   return newPyodide;
 };
 
+const prepareExports = (exports?: { name: string; content: string }[]) => {
+  let newExports = new Set<string>();
+  exports?.forEach(({ name, content }) => {
+    pyodide.FS.writeFile(name, content, { encoding: 'utf-8' });
+    newExports.add(name);
+  });
+
+  const oldExports = pyodide.FS.readdir('.') as string[];
+  oldExports.forEach((name) => {
+    if (name === '.' || name === '..' || newExports.has(name)) return;
+
+    pyodide.FS.unlink(name);
+  });
+
+  console.log(pyodide.FS.readdir('.'));
+};
+
 const listeners = {
   setInterruptBuffer: async (interruptBuffer: Uint8Array) => {
     pyodide ??= await preparePyodide();
     pyodide.setInterruptBuffer(interruptBuffer);
   },
 
-  run: async (code: string) => {
+  run: async ({ code, exports }: RunExportableData) => {
     pyodide ??= await preparePyodide();
     waiting = false;
 
     post.writeln(`${waiting ? '\n' : ''}\n${PS1}${RUN_CODE}`);
 
     try {
+      prepareExports(exports);
       await pyodide.loadPackagesFromImports(code);
 
       /**
@@ -102,7 +125,7 @@ const listeners = {
     }
   },
 
-  replInput: async (input: string) => {
+  replInput: async ({ code: input, exports }: RunExportableData) => {
     for (const line of input.split('\n')) {
       post.writeln(`${waiting ? '' : PS1}${line}`);
 
@@ -128,6 +151,7 @@ const listeners = {
           throw new Error(`Unexpected type: ${status}`);
       }
 
+      prepareExports(exports);
       const wrapped = await_fut(future) as PyProxyAwaitable;
 
       try {

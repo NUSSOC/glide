@@ -6,12 +6,14 @@ import { RootState } from '.';
 interface FilesState {
   files: Record<string, string>;
   list: string[];
+  exports: string[];
   selected?: string;
 }
 
 const initialState: FilesState = {
   files: {},
   list: [],
+  exports: [],
 };
 
 const findSuitableName = (
@@ -25,7 +27,6 @@ const findSuitableName = (
 
   while (names.has(newName)) {
     newName = transformer(counter);
-
     counter += 1;
   }
 
@@ -36,7 +37,13 @@ export const filesSlice = createSlice({
   name: 'files',
   initialState,
   reducers: {
-    rehydrate: (_, action: PayloadAction<FilesState>) => action.payload,
+    rehydrate: (
+      state,
+      action: PayloadAction<Pick<FilesState, 'files' | 'list'>>,
+    ) => {
+      state.files = action.payload.files;
+      state.list = action.payload.list;
+    },
     draft: (state, action: PayloadAction<boolean | undefined>) => {
       const name = findSuitableName(
         'untitled.py',
@@ -98,26 +105,38 @@ export const filesSlice = createSlice({
 
       if (state.selected === oldName) state.selected = newName;
     },
+    toggleExport: (state, action: PayloadAction<string>) => {
+      const exports = new Set(state.exports);
+      if (exports.has(action.payload)) {
+        exports.delete(action.payload);
+      } else {
+        exports.add(action.payload);
+      }
+      state.exports = Array.from(exports);
+    },
   },
 });
 
 const selectFiles = (state: RootState) => state.files;
-
-export const getFileNames = createSelector(selectFiles, (files) => files.list);
 
 export const getSelectedFileName = createSelector(
   selectFiles,
   (files) => files.selected,
 );
 
-export const getSelectedFileContent = createSelector(selectFiles, (files) =>
-  files.selected ? files.files[files.selected] : undefined,
-);
-
 export const getSelectedFile = createSelector(selectFiles, (files) =>
   files.selected
     ? { name: files.selected, content: files.files[files.selected] }
     : { name: undefined, content: undefined },
+);
+
+export const getExportsNameSet = createSelector(
+  selectFiles,
+  (files) => new Set(files.exports),
+);
+
+export const getExports = createSelector(selectFiles, (files) =>
+  files.exports.map((name) => ({ name, content: files.files[name] })),
 );
 
 export const filesActions = filesSlice.actions;
