@@ -40,6 +40,8 @@ const post = {
   write: (text: string) => postMessage({ type: 'write', payload: text }),
   writeln: (line: string) => postMessage({ type: 'writeln', payload: line }),
   error: (message: string) => postMessage({ type: 'error', payload: message }),
+  lock: () => postMessage({ type: 'lock' }),
+  unlock: () => postMessage({ type: 'unlock' }),
 };
 
 const setUpREPLEnvironment = () => {
@@ -97,6 +99,7 @@ const listeners = {
     post.writeln(`${waiting ? '\n' : ''}\n${PS1}${RUN_CODE}`);
 
     try {
+      post.lock();
       prepareExports(exports);
       await pyodide.loadPackagesFromImports(code);
 
@@ -112,6 +115,8 @@ const listeners = {
       if (!(error instanceof Error)) throw error;
 
       post.error(error.message);
+    } finally {
+      post.unlock();
     }
   },
 

@@ -10,6 +10,7 @@ import Button from './Button';
 
 interface EditorProps {
   onRunCode?: (code: string) => void;
+  showRunButton?: boolean;
 }
 
 interface CoreEditorProps extends EditorProps {
@@ -62,11 +63,13 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
         value={props.value}
       />
 
-      <div className="absolute bottom-3 right-3 space-x-2">
-        <Button icon={PlayIcon} onClick={runCode}>
-          Run
-        </Button>
-      </div>
+      {props.showRunButton && (
+        <div className="absolute bottom-3 right-3 space-x-2">
+          <Button icon={PlayIcon} onClick={runCode}>
+            Run
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

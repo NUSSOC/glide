@@ -11,6 +11,8 @@ interface Callbacks {
   writeln: (text: string) => void;
   error: (text: string) => void;
   exports?: () => { name: string; content: string }[];
+  lock: () => void;
+  unlock: () => void;
 }
 
 interface Message<L extends Record<string, any>> {

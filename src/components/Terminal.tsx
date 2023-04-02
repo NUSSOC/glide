@@ -5,11 +5,13 @@ import {
   useLayoutEffect,
   useRef,
 } from 'react';
+import { StopIcon } from '@heroicons/react/24/outline';
 import { slate, yellow } from 'tailwindcss/colors';
 import { Terminal as Xterm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebglAddon } from 'xterm-addon-webgl';
 
+import Button from './Button';
 import Prompt from './Prompt';
 import 'xterm/css/xterm.css';
 
@@ -22,6 +24,7 @@ interface TerminalRef {
 interface TerminalProps {
   onCtrlC?: () => void;
   onReturn?: (line: string) => void;
+  showStopButton?: boolean;
 }
 
 const Terminal = forwardRef<TerminalRef, TerminalProps>(
@@ -115,6 +118,14 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
             }}
           />
         </div>
+
+        {props.showStopButton && (
+          <div className="absolute right-3 top-3 z-20 space-x-2 opacity-50 hover:opacity-100">
+            <Button icon={StopIcon} onClick={props.onCtrlC}>
+              Stop
+            </Button>
+          </div>
+        )}
       </section>
     );
   },

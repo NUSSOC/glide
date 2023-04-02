@@ -1,4 +1,4 @@
-import { ComponentRef, useRef } from 'react';
+import { ComponentRef, useRef, useState } from 'react';
 import Split from 'react-split';
 
 import Editor from '../components/Editor';
@@ -12,11 +12,15 @@ const IDEPage = (): JSX.Element => {
 
   const exports = useFile.Exports();
 
+  const [running, setRunning] = useState(false);
+
   const interpreter = useInterpreter({
     write: (text: string) => consoleRef.current?.write(text),
     writeln: (text: string) => consoleRef.current?.append(text),
     error: (text: string) => consoleRef.current?.error(text),
     exports: () => exports,
+    lock: () => setRunning(true),
+    unlock: () => setRunning(false),
   });
 
   return (
@@ -29,13 +33,14 @@ const IDEPage = (): JSX.Element => {
       >
         <div className="flex h-full flex-col space-y-3">
           <Navigator />
-          <Editor onRunCode={interpreter.run} />
+          <Editor onRunCode={interpreter.run} showRunButton={!running} />
         </div>
 
         <Terminal
           ref={consoleRef}
           onCtrlC={interpreter.stop}
           onReturn={interpreter.execute}
+          showStopButton={running}
         />
       </Split>
     </main>
