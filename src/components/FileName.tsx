@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Transition } from '@headlessui/react';
 
+import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
-import { getSelectedFileName } from '../store/filesSlice';
-import { useAppSelector } from '../store/hooks';
 
 import UnsavedBadge from './UnsavedBadge';
 
@@ -62,32 +61,21 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
 };
 
 const FileName = (props: FileNameProps): JSX.Element => {
-  const selectedFileName = useAppSelector(getSelectedFileName);
-
-  const isFileUnsaved = useAppSelector(({ files, vault }) => {
-    if (!selectedFileName) return true;
-
-    const fileInFiles = files.files[selectedFileName];
-    const fileInVault = vault.files[selectedFileName];
-
-    return fileInFiles !== fileInVault;
-  });
-
-  const existingFileNames = useAppSelector(
-    ({ files, vault }) => new Set(files.list.concat(vault.list)),
-  );
+  const name = useFile.SelectedName();
+  const unsaved = useFile.IsUnsavedOf(name);
+  const existingNames = useFile.NamesSet();
 
   const { rename } = useFilesMutations();
 
   return (
     <div className="flex items-center space-x-3">
       <RenamableInput
-        initialValue={selectedFileName ?? ''}
+        initialValue={name ?? ''}
         onConfirm={(newName) => {
-          if (!selectedFileName) return;
-          if (existingFileNames.has(newName)) return;
+          if (!name) return;
+          if (existingNames.has(newName)) return;
 
-          rename(selectedFileName, newName);
+          rename(name, newName);
         }}
       />
 
@@ -98,7 +86,7 @@ const FileName = (props: FileNameProps): JSX.Element => {
         leave="transition-transform origin-left duration-150"
         leaveFrom="scale-100"
         leaveTo="scale-0"
-        show={Boolean(selectedFileName && isFileUnsaved)}
+        show={Boolean(name && unsaved)}
       >
         <UnsavedBadge />
       </Transition>

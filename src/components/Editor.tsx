@@ -3,9 +3,8 @@ import { PlayIcon } from '@heroicons/react/24/outline';
 import MonacoEditor from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
 
+import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
-import { getSelectedFile } from '../store/filesSlice';
-import { useAppSelector } from '../store/hooks';
 
 import Button from './Button';
 
@@ -74,7 +73,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 
 const Editor = (props: EditorProps): JSX.Element | null => {
   const { update, save } = useFilesMutations();
-  const { name, content } = useAppSelector(getSelectedFile);
+  const { name, content } = useFile.Selected();
 
   if (name === undefined || content === undefined) return null;
 

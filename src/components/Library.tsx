@@ -2,8 +2,8 @@ import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline';
 
+import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
-import { useAppSelector } from '../store/hooks';
 
 import Button from './Button';
 import FileItem from './FileItem';
@@ -14,14 +14,7 @@ interface LibraryProps {
 }
 
 const Library = (props: LibraryProps): JSX.Element => {
-  const files = useAppSelector(({ files, vault }) =>
-    files.list.map((name) => {
-      const fileInFiles = files.files[name];
-      const fileInVault = vault.files[name];
-
-      return { name, unsaved: fileInFiles !== fileInVault };
-    }),
-  );
+  const files = useFile.NamesWithUnsaved();
 
   const { draft } = useFilesMutations();
 

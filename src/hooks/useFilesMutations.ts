@@ -4,8 +4,12 @@ import { useAppDispatch } from '../store/hooks';
 import { vaultActions } from '../store/vaultSlice';
 
 interface UseFilesMutationsHook {
-  save: (name: string, content: string) => void;
+  /**
+   * For performance reasons, the caller should ensure that the new
+   * name is not already in use in *both* the files and vault stores.
+   */
   rename: (from: string, to: string) => void;
+  save: (name: string, content: string) => void;
   destroy: (name: string) => void;
   draft: (autoSelect?: boolean) => void;
   select: (name: string) => void;
@@ -22,6 +26,8 @@ const useFilesMutations = (): UseFilesMutationsHook => {
       persistor.flush();
     },
     rename: (from: string, to: string) => {
+      if (from === to) return;
+
       dispatch(filesActions.rename({ from, to }));
       dispatch(vaultActions.rename({ from, to }));
       persistor.flush();
