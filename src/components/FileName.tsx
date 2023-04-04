@@ -67,15 +67,17 @@ const FileName = (): JSX.Element => {
 
   return (
     <div className="flex min-w-0 items-center space-x-3">
-      <RenamableInput
-        initialValue={name ?? ''}
-        onConfirm={(newName) => {
-          if (!name) return;
-          if (existingNames.has(newName)) return;
+      {name && (
+        <RenamableInput
+          initialValue={name}
+          onConfirm={(newName) => {
+            if (!name) return;
+            if (existingNames.has(newName)) return;
 
-          rename(name, newName);
-        }}
-      />
+            rename(name, newName);
+          }}
+        />
+      )}
 
       <Transition
         enter="transition-transform origin-left duration-75"
