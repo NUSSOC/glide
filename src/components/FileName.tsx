@@ -6,8 +6,6 @@ import useFilesMutations from '../hooks/useFilesMutations';
 
 import UnsavedBadge from './UnsavedBadge';
 
-interface FileNameProps {}
-
 interface RenamableInputProps {
   initialValue: string;
   onConfirm: (value: string) => void;
@@ -60,7 +58,7 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
   );
 };
 
-const FileName = (props: FileNameProps): JSX.Element => {
+const FileName = (): JSX.Element => {
   const name = useFile.SelectedName();
   const unsaved = useFile.IsUnsavedOf(name);
   const existingNames = useFile.NamesSet();

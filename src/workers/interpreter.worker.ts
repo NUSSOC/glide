@@ -24,6 +24,7 @@ interface RunExportableData {
 }
 
 let pyodide: PyodideInterface;
+let interruptBuffer: Uint8Array | null;
 
 let namespace: PyProxy;
 let await_fut: PyProxyCallable;
@@ -39,6 +40,8 @@ const post = {
   write: (text: string) => postMessage({ type: 'write', payload: text }),
   writeln: (line: string) => postMessage({ type: 'writeln', payload: line }),
   error: (message: string) => postMessage({ type: 'error', payload: message }),
+  system: (message: string) =>
+    postMessage({ type: 'system', payload: message }),
   lock: () => postMessage({ type: 'lock' }),
   unlock: () => postMessage({ type: 'unlock' }),
   prompt: (newLine = true) => post.write(`${newLine ? '\n' : ''}${PS1}`),
@@ -64,9 +67,12 @@ const preparePyodide = async () => {
   newPyodide.setStderr({ batched: post.error });
   pyodide = newPyodide;
 
+  if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
+
   const banner = setUpREPLEnvironment();
   post.writeln(banner);
   post.prompt(false);
+  post.unlock();
 
   return newPyodide;
 };
@@ -87,9 +93,12 @@ const prepareExports = (exports?: { name: string; content: string }[]) => {
 };
 
 const listeners = {
-  initialize: async (interruptBuffer?: Uint8Array) => {
+  initialize: async (newInterruptBuffer?: Uint8Array) => {
     pyodide ??= await preparePyodide();
-    if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
+    if (!newInterruptBuffer) return;
+
+    pyodide.setInterruptBuffer(newInterruptBuffer);
+    interruptBuffer = newInterruptBuffer;
   },
 
   run: async ({ code, exports }: RunExportableData) => {
@@ -111,9 +120,25 @@ const listeners = {
 
       post.writeln(result?.toString());
     } catch (error) {
-      if (!(error instanceof Error)) throw error;
+      if (error instanceof Error) {
+        post.error(error.message);
+      }
 
-      post.error(error.message);
+      /**
+       * Pyodide may sometimes not catch `RecursionError`s and excessively
+       * recursive code spills as JavaScript `RangeError`, causing Pyodide to
+       * fatally crash. We need to restart Pyodide in this case.
+       * @see https://github.com/pyodide/pyodide/issues/951
+       */
+      if (error instanceof RangeError) {
+        post.system(
+          "\nOops, something happened and we have to restart the interpreter. Don't worry, it's not your fault. You may continue once you see the prompt again.\n",
+        );
+
+        await preparePyodide();
+      }
+
+      throw error;
     } finally {
       post.prompt();
       post.unlock();

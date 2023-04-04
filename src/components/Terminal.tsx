@@ -20,6 +20,7 @@ interface TerminalRef {
   append: (result?: string) => void;
   write: (result?: string) => void;
   error: (result?: string) => void;
+  system: (result?: string) => void;
 }
 
 interface TerminalProps {
@@ -108,6 +109,8 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       write: (result?: string) => write(result ?? '', false),
       error: (result?: string) =>
         write('\u001b[31m' + (result ?? '') + '\u001b[0m'),
+      system: (result?: string) =>
+        write('\u001b[33m' + (result ?? '') + '\u001b[0m'),
     }));
 
     return (
