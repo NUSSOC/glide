@@ -17,6 +17,8 @@ const FileUploader = (props: FileUploaderProps): JSX.Element => {
 
     const file = Array.from(files)[0];
 
+    console.log(file.type);
+
     const reader = new FileReader();
     reader.onload = ({ target }) =>
       props.onUpload?.(file.name, target?.result as string);
@@ -33,7 +35,7 @@ const FileUploader = (props: FileUploaderProps): JSX.Element => {
     >
       {props.children}
       <input
-        accept="text/csv, text/x-python-script"
+        accept="text/csv, text/x-python-script, text/x-python, .py, .csv"
         className="absolute bottom-0 left-0 right-0 top-0 cursor-pointer opacity-0"
         onChange={handleUpload}
         type="file"
