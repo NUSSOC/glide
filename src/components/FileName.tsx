@@ -33,7 +33,12 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
         setEditing(false);
         setNewFileName(undefined);
 
-        if (!newName || newName === props.initialValue) return;
+        if (
+          !newName ||
+          newName === props.initialValue ||
+          newName.startsWith('.')
+        )
+          return;
 
         if (!newName.endsWith('.py')) newName += '.py';
         props.onConfirm(newName);
