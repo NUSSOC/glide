@@ -1,6 +1,6 @@
 import { ComponentRef, useRef, useState } from 'react';
-import Split from 'react-split';
 
+import Between from '../components/Between';
 import Editor from '../components/Editor';
 import Navigator from '../components/Navigator';
 import Terminal from '../components/Terminal';
@@ -25,25 +25,24 @@ const IDEPage = (): JSX.Element => {
   });
 
   return (
-    <main className="h-screen w-screen  bg-slate-900 p-3 text-white">
-      <Split
-        className="flex h-full w-full flex-col"
-        direction="vertical"
-        gutterSize={15}
-        sizes={[70, 30]}
-      >
-        <div className="flex h-full flex-col space-y-3">
-          <Navigator />
-          <Editor onRunCode={interpreter.run} showRunButton={!running} />
-        </div>
-
-        <Terminal
-          ref={consoleRef}
-          onCtrlC={interpreter.stop}
-          onReturn={interpreter.execute}
-          showStopButton={running}
-        />
-      </Split>
+    <main className="h-screen w-screen bg-slate-900 p-3 text-white">
+      <Between
+        by={[70, 30]}
+        first={
+          <div className="flex h-full flex-col space-y-3">
+            <Navigator />
+            <Editor onRunCode={interpreter.run} showRunButton={!running} />
+          </div>
+        }
+        second={
+          <Terminal
+            ref={consoleRef}
+            onCtrlC={interpreter.stop}
+            onReturn={interpreter.execute}
+            showStopButton={running}
+          />
+        }
+      />
     </main>
   );
 };
