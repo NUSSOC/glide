@@ -87,7 +87,7 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     const write = (text: string, line = true) => {
       const trimmed = text.replace(/\n/g, '\r\n');
       const xterm = xtermRef.current;
-      if (!trimmed || !xterm) return;
+      if (!xterm) return;
 
       const writer = (text: string) =>
         line ? xterm.writeln(text) : xterm.write(text);
