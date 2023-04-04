@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+
+interface PromptRef {
+  focusWith: (key?: string) => void;
+}
 
 interface PromptProps {
   onCtrlC?: () => void;
@@ -7,8 +11,16 @@ interface PromptProps {
   onF2?: () => void;
 }
 
-const Prompt = (props: PromptProps): JSX.Element => {
+const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
   const [command, setCommand] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusWith: (key) => {
+      if (key) setCommand((currentCommand) => currentCommand + key);
+      inputRef.current?.focus();
+    },
+  }));
 
   return (
     <div className="flex items-center rounded-lg bg-slate-800 px-2 text-slate-300 shadow-2xl shadow-slate-900 focus-within:ring-2 focus-within:ring-slate-500">
@@ -25,6 +37,7 @@ const Prompt = (props: PromptProps): JSX.Element => {
         )}
 
         <input
+          ref={inputRef}
           className="w-full bg-transparent py-2 pr-2 font-mono text-sm outline-none"
           onChange={(e) => setCommand(e.target.value)}
           onKeyDown={(e) => {
@@ -55,6 +68,8 @@ const Prompt = (props: PromptProps): JSX.Element => {
       </div>
     </div>
   );
-};
+});
+
+Prompt.displayName = 'Prompt';
 
 export default Prompt;

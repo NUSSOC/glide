@@ -1,4 +1,5 @@
 import {
+  ComponentRef,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -27,12 +28,16 @@ interface TerminalProps {
   showStopButton?: boolean;
 }
 
+const isASCIIPrintable = (character: string): boolean =>
+  character >= String.fromCharCode(32) && character <= String.fromCharCode(126);
+
 const Terminal = forwardRef<TerminalRef, TerminalProps>(
   (props, ref): JSX.Element => {
     const xtermRef = useRef<Xterm>();
     const fitAddonRef = useRef<FitAddon>();
     const terminalRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
 
     useLayoutEffect(() => {
       const container = containerRef.current;
@@ -63,6 +68,12 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       const fitAddon = new FitAddon();
       xterm.loadAddon(fitAddon);
       xterm.loadAddon(new WebglAddon());
+
+      xterm.onKey(({ key }) => {
+        if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
+
+        promptRef.current?.focusWith(key);
+      });
 
       xterm.open(terminal);
       fitAddon.fit();
@@ -105,6 +116,7 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
 
         <div className="absolute bottom-0 left-0 z-10 w-full px-2 pb-2">
           <Prompt
+            ref={promptRef}
             onCtrlC={() => {
               props.onCtrlC?.();
               xtermRef.current?.scrollToBottom();
