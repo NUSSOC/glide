@@ -62,7 +62,11 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
 
             if (e.key === 'Tab') {
               e.preventDefault();
-              setCommand(produce((draft) => (draft.command = `${command}\t`)));
+              setCommand(
+                produce((draft) => {
+                  draft.command = `${command}\t`;
+                }),
+              );
             }
 
             if (e.ctrlKey && e.key === 'c') {
