@@ -10,7 +10,7 @@ const Button = (props: ButtonProps): JSX.Element => {
   return (
     <button
       {...buttonProps}
-      className={`inline-flex justify-center rounded-lg border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 transition-transform hover:bg-blue-200 focus:outline-none focus-visible:ring-2 active:scale-95 ${
+      className={`inline-flex justify-center rounded-lg border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 transition-transform hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-sky-500 active:scale-95 ${
         props.className ?? ''
       }`}
     >
