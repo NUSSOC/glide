@@ -28,7 +28,10 @@ module.exports = merge(common, {
       threshold: 10240,
     }),
     new CopyPlugin({
-      patterns: [resolve(__dirname, 'public/_headers')],
+      patterns: [
+        resolve(__dirname, 'public/_headers'),
+        resolve(__dirname, 'public/.htaccess'),
+      ],
     }),
   ],
 });
