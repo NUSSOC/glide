@@ -4,6 +4,8 @@ import produce from 'immer';
 
 import useCommandHistory from '../hooks/useCommandHistory';
 
+import K from './Hotkey';
+
 interface PromptRef {
   focusWith: (key?: string) => void;
 }
@@ -40,8 +42,8 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
         {!command.length && (
           <div className="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center overflow-hidden">
             <p className="overflow-ellipsis whitespace-nowrap text-sm opacity-50">
-              Python commands go here! <kbd>Ctrl</kbd>+<kbd>C</kbd> stops
-              execution. <kbd>F2</kbd> clears the console.
+              Python commands go here! <K of="Ctrl+C" /> stops execution.{' '}
+              <K of="F2" /> clears the console.
             </p>
           </div>
         )}
