@@ -24,7 +24,6 @@ interface RunExportableData {
 }
 
 let pyodide: PyodideInterface;
-let waiting = false;
 
 let namespace: PyProxy;
 let await_fut: PyProxyCallable;
@@ -42,6 +41,8 @@ const post = {
   error: (message: string) => postMessage({ type: 'error', payload: message }),
   lock: () => postMessage({ type: 'lock' }),
   unlock: () => postMessage({ type: 'unlock' }),
+  prompt: (newLine = true) => post.write(`${newLine ? '\n' : ''}${PS1}`),
+  promptPending: () => post.write(PS2),
 };
 
 const setUpREPLEnvironment = () => {
@@ -65,6 +66,7 @@ const preparePyodide = async () => {
 
   const banner = setUpREPLEnvironment();
   post.writeln(banner);
+  post.prompt(false);
 
   return newPyodide;
 };
@@ -92,9 +94,8 @@ const listeners = {
 
   run: async ({ code, exports }: RunExportableData) => {
     pyodide ??= await preparePyodide();
-    waiting = false;
 
-    post.writeln(`${waiting ? '\n' : ''}\n${PS1}${RUN_CODE}`);
+    post.writeln(RUN_CODE);
 
     try {
       post.lock();
@@ -114,6 +115,7 @@ const listeners = {
 
       post.error(error.message);
     } finally {
+      post.prompt();
       post.unlock();
     }
   },
@@ -123,60 +125,57 @@ const listeners = {
       clear_console();
       await await_fut(pyconsole.push(''));
     } finally {
-      post.error(`${waiting ? '\n' : ''}KeyboardInterrupt`);
-      waiting = false;
+      post.error('\nKeyboardInterrupt');
+      post.prompt();
     }
   },
 
-  replInput: async ({ code: input, exports }: RunExportableData) => {
-    for (const line of input.split('\n')) {
-      post.writeln(`${waiting ? '' : PS1}${line}`);
+  replInput: async ({ code, exports }: RunExportableData) => {
+    post.writeln(code);
 
-      const future = pyconsole.push(line) as PyProxy;
+    const future = pyconsole.push(code) as PyProxy;
 
-      const status = future.syntax_check as SyntaxCheck;
-      switch (status) {
-        case 'syntax-error':
-          waiting = false;
-          post.error(future.formatted_error.trimEnd());
-          continue;
+    const status = future.syntax_check as SyntaxCheck;
+    switch (status) {
+      case 'syntax-error':
+        post.error(future.formatted_error.trimEnd());
+        post.prompt();
+        return;
 
-        case 'incomplete':
-          waiting = true;
-          post.write(PS2);
-          continue;
+      case 'incomplete':
+        post.promptPending();
+        return;
 
-        case 'complete':
-          waiting = false;
-          break;
+      case 'complete':
+        break;
 
-        default:
-          throw new Error(`Unexpected type: ${status}`);
+      default:
+        throw new Error(`Unexpected type: ${status}`);
+    }
+
+    prepareExports(exports);
+    const wrapped = await_fut(future) as PyProxyAwaitable;
+
+    try {
+      const [value] = await wrapped;
+      if (value !== undefined) {
+        const repr = repr_shorten.callKwargs(value, {
+          separator: '\n<long output truncated>\n',
+        }) as string;
+
+        post.writeln(repr);
       }
 
-      prepareExports(exports);
-      const wrapped = await_fut(future) as PyProxyAwaitable;
+      if (pyodide.isPyProxy(value)) value.destroy();
+    } catch (error) {
+      if (!(error instanceof Error)) throw error;
 
-      try {
-        const [value] = await wrapped;
-        if (value !== undefined) {
-          const repr = repr_shorten.callKwargs(value, {
-            separator: '\n<long output truncated>\n',
-          }) as string;
-
-          post.writeln(repr);
-        }
-
-        if (pyodide.isPyProxy(value)) value.destroy();
-      } catch (error) {
-        if (!(error instanceof Error)) throw error;
-
-        const message = future.formatted_error || error.message;
-        post.error(message.trimEnd());
-      } finally {
-        future.destroy();
-        wrapped.destroy();
-      }
+      const message = future.formatted_error || error.message;
+      post.error(message.trimEnd());
+    } finally {
+      post.prompt();
+      future.destroy();
+      wrapped.destroy();
     }
   },
 };
