@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
 
 import FileName from './FileName';
+import K from './Hotkey';
 import Item from './Item';
 import Library from './Library';
 
 const Navigator = (): JSX.Element => {
   const [openLibrary, setOpenLibrary] = useState(false);
+
+  const handleShortcut = (e: KeyboardEvent) => {
+    const isMod = navigator.platform.startsWith('Mac') ? e.metaKey : e.ctrlKey;
+
+    if (isMod && e.key === 'o') {
+      e.preventDefault();
+      setOpenLibrary(true);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleShortcut);
+    return () => window.removeEventListener('keydown', handleShortcut);
+  }, [handleShortcut]);
 
   return (
     <>
@@ -19,7 +34,7 @@ const Navigator = (): JSX.Element => {
             icon={BuildingLibraryIcon}
             onClick={() => setOpenLibrary(true)}
           >
-            Library
+            Library <K of="Mod+O" />
           </Item>
         </div>
       </nav>
