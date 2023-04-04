@@ -1,6 +1,10 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowUpTrayIcon,
+  CubeIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
 
 import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
@@ -53,11 +57,15 @@ const Library = (props: LibraryProps): JSX.Element => {
                   Library
                 </Dialog.Title>
 
-                <div className="mt-2">
-                  <p className="text-sm text-slate-400">
-                    The files you have saved are listed below.
-                  </p>
-                </div>
+                {Boolean(files.length) && (
+                  <div className="mt-2">
+                    <p className="align-middle text-sm text-slate-400">
+                      To make a file accessible in Python, activate its
+                      <CubeIcon className="mx-1 inline h-7 rounded bg-blue-600/10 p-1 text-blue-400" />
+                      button.
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-4 flex flex-col space-y-2">
                   {files.map(({ name, unsaved }) => (
