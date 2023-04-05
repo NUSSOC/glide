@@ -1,4 +1,5 @@
 import {
+  ComponentRef,
   forwardRef,
   useEffect,
   useImperativeHandle,
@@ -19,6 +20,7 @@ interface TerminalRef {
   append: (result?: string) => void;
   write: (result?: string) => void;
   error: (result?: string) => void;
+  system: (result?: string) => void;
 }
 
 interface TerminalProps {
@@ -27,12 +29,16 @@ interface TerminalProps {
   showStopButton?: boolean;
 }
 
+const isASCIIPrintable = (character: string): boolean =>
+  character >= String.fromCharCode(32) && character <= String.fromCharCode(126);
+
 const Terminal = forwardRef<TerminalRef, TerminalProps>(
   (props, ref): JSX.Element => {
     const xtermRef = useRef<Xterm>();
     const fitAddonRef = useRef<FitAddon>();
     const terminalRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
 
     useLayoutEffect(() => {
       const container = containerRef.current;
@@ -64,6 +70,12 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       xterm.loadAddon(fitAddon);
       xterm.loadAddon(new WebglAddon());
 
+      xterm.onKey(({ key }) => {
+        if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
+
+        promptRef.current?.focusWith(key);
+      });
+
       xterm.open(terminal);
       fitAddon.fit();
 
@@ -76,7 +88,7 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     const write = (text: string, line = true) => {
       const trimmed = text.replace(/\n/g, '\r\n');
       const xterm = xtermRef.current;
-      if (!trimmed || !xterm) return;
+      if (!xterm) return;
 
       const writer = (text: string) =>
         line ? xterm.writeln(text) : xterm.write(text);
@@ -97,6 +109,8 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       write: (result?: string) => write(result ?? '', false),
       error: (result?: string) =>
         write('\u001b[31m' + (result ?? '') + '\u001b[0m'),
+      system: (result?: string) =>
+        write('\u001b[33m' + (result ?? '') + '\u001b[0m'),
     }));
 
     return (
@@ -104,19 +118,22 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
         <div ref={terminalRef} className="h-full" />
 
         <div className="absolute bottom-0 left-0 z-10 w-full px-2 pb-2">
-          <Prompt
-            onCtrlC={() => {
-              props.onCtrlC?.();
-              xtermRef.current?.scrollToBottom();
-            }}
-            onF2={() => {
-              xtermRef.current?.clear();
-            }}
-            onReturn={(input) => {
-              props.onReturn?.(input);
-              xtermRef.current?.scrollToBottom();
-            }}
-          />
+          {!props.showStopButton && (
+            <Prompt
+              ref={promptRef}
+              onCtrlC={() => {
+                props.onCtrlC?.();
+                xtermRef.current?.scrollToBottom();
+              }}
+              onF2={() => {
+                xtermRef.current?.clear();
+              }}
+              onReturn={(input) => {
+                props.onReturn?.(input);
+                xtermRef.current?.scrollToBottom();
+              }}
+            />
+          )}
         </div>
 
         {props.showStopButton && (

@@ -24,7 +24,7 @@ interface RunExportableData {
 }
 
 let pyodide: PyodideInterface;
-let waiting = false;
+let interruptBuffer: Uint8Array | null;
 
 let namespace: PyProxy;
 let await_fut: PyProxyCallable;
@@ -40,8 +40,12 @@ const post = {
   write: (text: string) => postMessage({ type: 'write', payload: text }),
   writeln: (line: string) => postMessage({ type: 'writeln', payload: line }),
   error: (message: string) => postMessage({ type: 'error', payload: message }),
+  system: (message: string) =>
+    postMessage({ type: 'system', payload: message }),
   lock: () => postMessage({ type: 'lock' }),
   unlock: () => postMessage({ type: 'unlock' }),
+  prompt: (newLine = true) => post.write(`${newLine ? '\n' : ''}${PS1}`),
+  promptPending: () => post.write(PS2),
 };
 
 const setUpREPLEnvironment = () => {
@@ -63,8 +67,12 @@ const preparePyodide = async () => {
   newPyodide.setStderr({ batched: post.error });
   pyodide = newPyodide;
 
+  if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
+
   const banner = setUpREPLEnvironment();
   post.writeln(banner);
+  post.prompt(false);
+  post.unlock();
 
   return newPyodide;
 };
@@ -85,16 +93,18 @@ const prepareExports = (exports?: { name: string; content: string }[]) => {
 };
 
 const listeners = {
-  initialize: async (interruptBuffer?: Uint8Array) => {
+  initialize: async (newInterruptBuffer?: Uint8Array) => {
     pyodide ??= await preparePyodide();
-    if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
+    if (!newInterruptBuffer) return;
+
+    pyodide.setInterruptBuffer(newInterruptBuffer);
+    interruptBuffer = newInterruptBuffer;
   },
 
   run: async ({ code, exports }: RunExportableData) => {
     pyodide ??= await preparePyodide();
-    waiting = false;
 
-    post.writeln(`${waiting ? '\n' : ''}\n${PS1}${RUN_CODE}`);
+    post.writeln(RUN_CODE);
 
     try {
       post.lock();
@@ -110,10 +120,27 @@ const listeners = {
 
       post.writeln(result?.toString());
     } catch (error) {
-      if (!(error instanceof Error)) throw error;
+      if (error instanceof Error) {
+        post.error(error.message);
+      }
 
-      post.error(error.message);
+      /**
+       * Pyodide may sometimes not catch `RecursionError`s and excessively
+       * recursive code spills as JavaScript `RangeError`, causing Pyodide to
+       * fatally crash. We need to restart Pyodide in this case.
+       * @see https://github.com/pyodide/pyodide/issues/951
+       */
+      if (error instanceof RangeError) {
+        post.system(
+          "\nOops, something happened and we have to restart the interpreter. Don't worry, it's not your fault. You may continue once you see the prompt again.\n",
+        );
+
+        await preparePyodide();
+      }
+
+      throw error;
     } finally {
+      post.prompt();
       post.unlock();
     }
   },
@@ -123,60 +150,57 @@ const listeners = {
       clear_console();
       await await_fut(pyconsole.push(''));
     } finally {
-      post.error(`${waiting ? '\n' : ''}KeyboardInterrupt`);
-      waiting = false;
+      post.error('\nKeyboardInterrupt');
+      post.prompt();
     }
   },
 
-  replInput: async ({ code: input, exports }: RunExportableData) => {
-    for (const line of input.split('\n')) {
-      post.writeln(`${waiting ? '' : PS1}${line}`);
+  replInput: async ({ code, exports }: RunExportableData) => {
+    post.writeln(code);
 
-      const future = pyconsole.push(line) as PyProxy;
+    const future = pyconsole.push(code) as PyProxy;
 
-      const status = future.syntax_check as SyntaxCheck;
-      switch (status) {
-        case 'syntax-error':
-          waiting = false;
-          post.error(future.formatted_error.trimEnd());
-          continue;
+    const status = future.syntax_check as SyntaxCheck;
+    switch (status) {
+      case 'syntax-error':
+        post.error(future.formatted_error.trimEnd());
+        post.prompt();
+        return;
 
-        case 'incomplete':
-          waiting = true;
-          post.write(PS2);
-          continue;
+      case 'incomplete':
+        post.promptPending();
+        return;
 
-        case 'complete':
-          waiting = false;
-          break;
+      case 'complete':
+        break;
 
-        default:
-          throw new Error(`Unexpected type: ${status}`);
+      default:
+        throw new Error(`Unexpected type: ${status}`);
+    }
+
+    prepareExports(exports);
+    const wrapped = await_fut(future) as PyProxyAwaitable;
+
+    try {
+      const [value] = await wrapped;
+      if (value !== undefined) {
+        const repr = repr_shorten.callKwargs(value, {
+          separator: '\n<long output truncated>\n',
+        }) as string;
+
+        post.writeln(repr);
       }
 
-      prepareExports(exports);
-      const wrapped = await_fut(future) as PyProxyAwaitable;
+      if (pyodide.isPyProxy(value)) value.destroy();
+    } catch (error) {
+      if (!(error instanceof Error)) throw error;
 
-      try {
-        const [value] = await wrapped;
-        if (value !== undefined) {
-          const repr = repr_shorten.callKwargs(value, {
-            separator: '\n<long output truncated>\n',
-          }) as string;
-
-          post.writeln(repr);
-        }
-
-        if (pyodide.isPyProxy(value)) value.destroy();
-      } catch (error) {
-        if (!(error instanceof Error)) throw error;
-
-        const message = future.formatted_error || error.message;
-        post.error(message.trimEnd());
-      } finally {
-        future.destroy();
-        wrapped.destroy();
-      }
+      const message = future.formatted_error || error.message;
+      post.error(message.trimEnd());
+    } finally {
+      post.prompt();
+      future.destroy();
+      wrapped.destroy();
     }
   },
 };

@@ -33,7 +33,7 @@ const Item = (props: ItemProps): JSX.Element => {
       )}
 
       <p
-        className={`overflow-hidden overflow-ellipsis whitespace-nowrap text-sm opacity-80 ${
+        className={`whitespace-nowrap text-sm opacity-80 ${
           !selected ? 'group-hover:opacity-90' : ''
         } ${labelClassName ?? ''}`}
       >

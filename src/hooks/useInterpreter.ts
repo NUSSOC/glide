@@ -10,6 +10,7 @@ interface Callbacks {
   write: (text: string) => void;
   writeln: (text: string) => void;
   error: (text: string) => void;
+  system: (text: string) => void;
   exports?: () => { name: string; content: string }[];
   lock: () => void;
   unlock: () => void;

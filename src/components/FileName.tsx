@@ -6,8 +6,6 @@ import useFilesMutations from '../hooks/useFilesMutations';
 
 import UnsavedBadge from './UnsavedBadge';
 
-interface FileNameProps {}
-
 interface RenamableInputProps {
   initialValue: string;
   onConfirm: (value: string) => void;
@@ -35,7 +33,12 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
         setEditing(false);
         setNewFileName(undefined);
 
-        if (!newName || newName === props.initialValue) return;
+        if (
+          !newName ||
+          newName === props.initialValue ||
+          newName.startsWith('.')
+        )
+          return;
 
         if (!newName.endsWith('.py')) newName += '.py';
         props.onConfirm(newName);
@@ -60,7 +63,7 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
   );
 };
 
-const FileName = (props: FileNameProps): JSX.Element => {
+const FileName = (): JSX.Element => {
   const name = useFile.SelectedName();
   const unsaved = useFile.IsUnsavedOf(name);
   const existingNames = useFile.NamesSet();
@@ -69,15 +72,17 @@ const FileName = (props: FileNameProps): JSX.Element => {
 
   return (
     <div className="flex min-w-0 items-center space-x-3">
-      <RenamableInput
-        initialValue={name ?? ''}
-        onConfirm={(newName) => {
-          if (!name) return;
-          if (existingNames.has(newName)) return;
+      {name && (
+        <RenamableInput
+          initialValue={name}
+          onConfirm={(newName) => {
+            if (!name) return;
+            if (existingNames.has(newName)) return;
 
-          rename(name, newName);
-        }}
-      />
+            rename(name, newName);
+          }}
+        />
+      )}
 
       <Transition
         enter="transition-transform origin-left duration-75"

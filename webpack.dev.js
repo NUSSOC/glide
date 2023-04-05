@@ -12,6 +12,12 @@ module.exports = merge(common, {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
     },
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+      },
+    },
   },
   plugins: [
     new ReactRefreshWebpackPlugin(),
