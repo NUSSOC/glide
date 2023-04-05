@@ -35,7 +35,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 
     if (e.key === 'F5') {
       e.preventDefault();
-      runCode();
+      saveThenRunCode();
     }
   };
 
@@ -44,8 +44,10 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
     return () => window.removeEventListener('keydown', handleShortcut);
   }, [handleShortcut]);
 
-  const runCode = () => {
-    props.onRunCode?.(ref.current?.getValue() ?? '');
+  const saveThenRunCode = () => {
+    const content = ref.current?.getValue() ?? '';
+    props.onSave(content);
+    props.onRunCode?.(content);
   };
 
   return (
@@ -69,7 +71,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 
       {props.showRunButton && (
         <div className="absolute bottom-3 right-3 space-x-2">
-          <Button icon={PlayIcon} onClick={runCode}>
+          <Button icon={PlayIcon} onClick={saveThenRunCode}>
             Run
           </Button>
         </div>
