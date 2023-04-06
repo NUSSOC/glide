@@ -21,7 +21,7 @@ const Library = (props: LibraryProps): JSX.Element => {
 
   return (
     <Transition appear as={Fragment} show={props.open}>
-      <Dialog className="relative z-10" onClose={props.onClose}>
+      <Dialog className="relative z-40" onClose={props.onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-100"
