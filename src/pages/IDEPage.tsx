@@ -10,8 +10,6 @@ import useInterpreter from '../hooks/useInterpreter';
 const IDEPage = (): JSX.Element => {
   const consoleRef = useRef<ComponentRef<typeof Terminal>>(null);
 
-  const exports = useFile.Exports();
-
   const [running, setRunning] = useState(false);
 
   const interpreter = useInterpreter({
@@ -19,7 +17,7 @@ const IDEPage = (): JSX.Element => {
     writeln: (text: string) => consoleRef.current?.append(text),
     error: (text: string) => consoleRef.current?.error(text),
     system: (text: string) => consoleRef.current?.system(text),
-    exports: () => exports,
+    exports: useFile.Exports,
     lock: () => setRunning(true),
     unlock: () => setRunning(false),
   });

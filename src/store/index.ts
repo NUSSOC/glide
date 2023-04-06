@@ -36,5 +36,7 @@ export const persistor = persistStore(store, null, () => {
   store.dispatch(filesActions.rehydrate(vault));
 });
 
+export const getState = store.getState;
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

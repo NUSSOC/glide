@@ -1,9 +1,5 @@
-import {
-  getExports,
-  getExportsNameSet,
-  getSelectedFile,
-  getSelectedFileName,
-} from '../store/filesSlice';
+import { getState } from '../store';
+import { getSelectedFile, getSelectedFileName } from '../store/filesSlice';
 import { useAppSelector } from '../store/hooks';
 
 const Selected = () => useAppSelector(getSelectedFile);
@@ -33,11 +29,9 @@ const IsUnsavedOf = (name?: string) =>
     return fileInFiles !== fileInVault;
   });
 
-const Exports = () => useAppSelector(getExports);
-
-const Exported = (name: string) => {
-  const exports = useAppSelector(getExportsNameSet);
-  return new Set(exports).has(name);
+const Exports = () => {
+  const { files, list } = getState().vault;
+  return list.map((name) => ({ name, content: files[name] }));
 };
 
 const useFile = {
@@ -47,7 +41,6 @@ const useFile = {
   NamesWithUnsaved,
   IsUnsavedOf,
   Exports,
-  Exported,
 };
 
 export default useFile;
