@@ -145,22 +145,20 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
         <div ref={terminalRef} className="h-full" />
 
         <div className="absolute bottom-0 left-0 z-10 w-full px-2 pb-2">
-          {!props.showStopButton && (
-            <Prompt
-              ref={promptRef}
-              onCtrlC={() => {
-                props.onCtrlC?.();
-                xtermRef.current?.scrollToBottom();
-              }}
-              onF2={() => {
-                xtermRef.current?.clear();
-              }}
-              onReturn={(input) => {
-                props.onReturn?.(input);
-                xtermRef.current?.scrollToBottom();
-              }}
-            />
-          )}
+          <Prompt
+            ref={promptRef}
+            onCtrlC={() => {
+              props.onCtrlC?.();
+              xtermRef.current?.scrollToBottom();
+            }}
+            onF2={() => {
+              xtermRef.current?.clear();
+            }}
+            onReturn={(input) => {
+              props.onReturn?.(input);
+              xtermRef.current?.scrollToBottom();
+            }}
+          />
         </div>
 
         {props.showStopButton && (
