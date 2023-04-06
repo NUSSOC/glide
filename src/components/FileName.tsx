@@ -36,14 +36,19 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
         if (
           !newName ||
           newName === props.initialValue ||
-          newName.startsWith('.')
+          newName.startsWith('.') ||
+          newName.endsWith('.')
         )
           return;
 
-        if (!newName.endsWith('.py')) newName += '.py';
         props.onConfirm(newName);
       }}
       onChange={(e) => setNewFileName(e.target.value)}
+      onFocus={(e) => {
+        const name = e.target.value;
+        const extensionLength = name.split('.').pop()?.length ?? 0;
+        e.target.setSelectionRange(0, name.length - extensionLength - 1);
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
