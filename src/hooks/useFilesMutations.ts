@@ -50,6 +50,8 @@ const useFilesMutations = (): UseFilesMutationsHook => {
     },
     create: (name: string, content: string) => {
       dispatch(filesActions.create({ name, content }));
+      dispatch(vaultActions.save({ name, content }));
+      persistor.flush();
     },
     toggleExport: (name: string) => {
       dispatch(filesActions.toggleExport(name));
