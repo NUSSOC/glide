@@ -9,6 +9,7 @@ import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
 
 import UnsavedBadge from './UnsavedBadge';
+import { useLayoutEffect, useRef } from 'react';
 
 interface FileItemProps {
   name: string;
@@ -20,10 +21,20 @@ const FileItem = (props: FileItemProps): JSX.Element => {
   const { select, destroy, toggleExport } = useFilesMutations();
 
   const exported = useFile.Exported(props.name);
+  const selectedFileName = useFile.SelectedName();
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => {
+    if (props.name !== selectedFileName) return;
+
+    buttonRef.current?.focus();
+  }, [props.name, selectedFileName]);
 
   return (
     <div className="flex items-center space-x-2">
       <button
+        ref={buttonRef}
         className="group flex w-full min-w-0 select-none flex-row items-center justify-between rounded-lg bg-slate-700 p-3 text-slate-100 transition-transform hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 active:scale-95"
         onClick={() => {
           select(props.name);
