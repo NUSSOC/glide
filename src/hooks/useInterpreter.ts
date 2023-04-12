@@ -4,6 +4,7 @@ interface Interpreter {
   run: (code: string) => void;
   stop: () => void;
   execute: (command: string) => void;
+  restart: () => void;
 }
 
 interface Callbacks {
@@ -57,6 +58,11 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
     interruptBufferRef.current[0] = 0;
   };
 
+  const restartInterpreter = () => {
+    workerRef.current?.terminate();
+    setUpInterpreterWorker();
+  };
+
   return {
     run: (code) => {
       resetInterruptBuffer();
@@ -70,8 +76,10 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
         interruptBufferRef.current[0] = 2;
         workerRef.current?.postMessage({ type: 'replClear' });
       } else {
-        workerRef.current?.terminate();
-        setUpInterpreterWorker();
+        callbacks.system(
+          "\nDue to browser incompatibility, we can't stop your code execution gracefully. Instead, we'll restart the interpreter for you. Hold on yah...\n",
+        );
+        restartInterpreter();
       }
     },
     execute: (code) => {
@@ -80,6 +88,10 @@ const useInterpreter = (callbacks: Callbacks): Interpreter => {
         type: 'replInput',
         payload: { code, exports: callbacks.exports?.() },
       });
+    },
+    restart: () => {
+      callbacks.system('\nOkies! Restarting interpreter...\n');
+      restartInterpreter();
     },
   };
 };

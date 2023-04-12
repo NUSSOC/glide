@@ -35,8 +35,9 @@ const IDEPage = (): JSX.Element => {
         second={
           <Terminal
             ref={consoleRef}
-            onCtrlC={interpreter.stop}
+            onRestart={interpreter.restart}
             onReturn={interpreter.execute}
+            onStop={interpreter.stop}
             showStopButton={running}
           />
         }

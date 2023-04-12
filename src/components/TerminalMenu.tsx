@@ -77,6 +77,10 @@ const TerminalMenu = (props: TerminalMenuProps): JSX.Element => {
           <div className="px-1 py-1">
             <MenuHeader>Interpreter</MenuHeader>
 
+            <MenuItem icon={ArrowPathIcon} onClick={props.onClickRestart}>
+              Restart
+            </MenuItem>
+
             <MenuItem icon={StopIcon} onClick={props.onClickForceStop}>
               Force stop
             </MenuItem>
