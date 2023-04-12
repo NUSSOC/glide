@@ -1,5 +1,6 @@
 interface HotkeyProps {
   of: string;
+  className?: string;
 }
 
 const isMac = navigator.platform.startsWith('Mac');
@@ -30,12 +31,18 @@ const Hotkey = (props: HotkeyProps): JSX.Element => {
 
   const keys = hotkey.split(SEPARATOR);
 
-  if (isMac) return <kbd>{keys.map(convert).join('')}</kbd>;
+  if (isMac)
+    return <kbd className={props.className}>{keys.map(convert).join('')}</kbd>;
 
   return (
     <>
       {keys
-        .flatMap((key) => [<kbd key={key}>{convert(key)}</kbd>, SEPARATOR])
+        .flatMap((key) => [
+          <kbd key={key} className={props.className}>
+            {convert(key)}
+          </kbd>,
+          SEPARATOR,
+        ])
         .slice(0, -1)}
     </>
   );

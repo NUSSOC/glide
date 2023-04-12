@@ -7,6 +7,7 @@ import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
 
 import Button from './Button';
+import K from './Hotkey';
 
 interface EditorProps {
   onRunCode?: (code: string) => void;
@@ -72,6 +73,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
         <div className="absolute bottom-3 right-3 space-x-2">
           <Button icon={PlayIcon} onClick={saveThenRunCode}>
             Run
+            <K className="ml-2 text-blue-900/60 ring-blue-900/60" of="F5" />
           </Button>
         </div>
       )}
