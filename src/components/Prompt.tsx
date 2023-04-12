@@ -4,16 +4,12 @@ import produce from 'immer';
 
 import useCommandHistory from '../hooks/useCommandHistory';
 
-import K from './Hotkey';
-
 interface PromptRef {
   focusWith: (key?: string) => void;
 }
 
 interface PromptProps {
-  onCtrlC?: () => void;
   onReturn?: (command: string) => void;
-  onF2?: () => void;
 }
 
 const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
@@ -35,15 +31,14 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
   }));
 
   return (
-    <div className="flex items-center rounded-lg bg-slate-800 px-2 text-slate-300 shadow-2xl shadow-slate-900 focus-within:ring-2 focus-within:ring-slate-500">
+    <div className="flex w-full items-center rounded-lg bg-slate-800 px-2 text-slate-300 shadow-2xl shadow-slate-900 focus-within:ring-2 focus-within:ring-slate-500">
       <ChevronRightIcon className="h-5" />
 
       <div className="relative ml-2 w-full">
         {!command.length && (
           <div className="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center overflow-hidden">
             <p className="overflow-ellipsis whitespace-nowrap text-sm opacity-50">
-              Python commands go here! <K of="Ctrl+C" /> stops execution.{' '}
-              <K of="F2" /> clears the console.
+              Python commands go here! More options? &rarr;
             </p>
           </div>
         )}
@@ -69,17 +64,6 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
                   draft.command = `${command}\t`;
                 }),
               );
-            }
-
-            if (e.ctrlKey && e.key === 'c') {
-              e.preventDefault();
-              props.onCtrlC?.();
-              setCommand({ dirty: false, command: '' });
-            }
-
-            if (e.key === 'F2') {
-              e.preventDefault();
-              props.onF2?.();
             }
 
             if (e.key === 'ArrowUp' && (!command || !dirty)) {

@@ -15,6 +15,7 @@ import { WebglAddon } from 'xterm-addon-webgl';
 
 import Button from './Button';
 import Prompt from './Prompt';
+import TerminalMenu from './TerminalMenu';
 import 'xterm/css/xterm.css';
 
 interface TerminalRef {
@@ -141,21 +142,22 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     }));
 
     return (
-      <section ref={containerRef} className="windowed h-full w-full">
-        <div ref={terminalRef} className="h-full" />
+      <section ref={containerRef} className="relative h-full w-full">
+        <div ref={terminalRef} className="windowed h-full" />
 
-        <div className="absolute bottom-0 left-0 z-10 w-full px-2 pb-2">
+        <div className="absolute bottom-0 left-0 z-40 flex w-full space-x-2 px-2 pb-2">
           <Prompt
             ref={promptRef}
-            onCtrlC={() => {
-              props.onCtrlC?.();
-              xtermRef.current?.scrollToBottom();
-            }}
-            onF2={() => {
-              xtermRef.current?.clear();
-            }}
             onReturn={(input) => {
               props.onReturn?.(input);
+              xtermRef.current?.scrollToBottom();
+            }}
+          />
+
+          <TerminalMenu
+            onClickClearConsole={() => xtermRef.current?.clear()}
+            onClickForceStop={() => {
+              props.onCtrlC?.();
               xtermRef.current?.scrollToBottom();
             }}
           />
