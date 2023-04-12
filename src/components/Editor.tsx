@@ -17,7 +17,6 @@ interface CoreEditorProps extends EditorProps {
   onSave: (content: string) => void;
   onChange: (value: string) => void;
   value: string;
-  dependsOn?: string;
 }
 
 const CoreEditor = (props: CoreEditorProps): JSX.Element => {
@@ -93,7 +92,6 @@ const Editor = (props: EditorProps): JSX.Element | null => {
   return (
     <CoreEditor
       {...props}
-      dependsOn={name}
       onChange={update}
       onSave={(newContent) => save(name, newContent)}
       value={content}
