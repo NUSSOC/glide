@@ -46,12 +46,18 @@ const Library = (props: LibraryProps): JSX.Element => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-slate-800 p-5 text-left align-middle shadow-xl ring-2 ring-slate-700 transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-white"
-                >
-                  Library
-                </Dialog.Title>
+                <div className="flex justify-between">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-white"
+                  >
+                    Library
+                  </Dialog.Title>
+
+                  <p className="select-none text-sm text-slate-600">
+                    {__VERSION__}
+                  </p>
+                </div>
 
                 <div className="mt-6 flex flex-col space-y-2">
                   {files.map(({ name, unsaved }) => (

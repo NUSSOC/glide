@@ -1,5 +1,6 @@
 const { resolve } = require('path');
 const zlib = require('zlib');
+const { DefinePlugin } = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { merge } = require('webpack-merge');
@@ -13,6 +14,9 @@ module.exports = merge(common, {
     clean: true,
   },
   plugins: [
+    new DefinePlugin({
+      __VERSION__: JSON.stringify(`v${require('./package.json').version}`),
+    }),
     new CompressionPlugin({
       test: /\.(js|css|html|svg|data|wasm)$/,
       algorithm: 'gzip',

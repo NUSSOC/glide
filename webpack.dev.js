@@ -1,4 +1,5 @@
 const { merge, mergeWithRules } = require('webpack-merge');
+const { DefinePlugin } = require('webpack');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const ESLintWebpackPlugin = require('eslint-webpack-plugin');
 
@@ -20,6 +21,7 @@ module.exports = merge(common, {
     },
   },
   plugins: [
+    new DefinePlugin({ __VERSION__: JSON.stringify('edge') }),
     new ReactRefreshWebpackPlugin(),
     new ESLintWebpackPlugin({
       extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
