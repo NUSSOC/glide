@@ -4,6 +4,7 @@ import {
   PyProxy,
   PyProxyAwaitable,
   PyProxyCallable,
+  PyProxyDict,
 } from 'pyodide';
 
 import consoleScript from '../assets/console.py';
@@ -26,11 +27,11 @@ interface RunExportableData {
 let pyodide: PyodideInterface;
 let interruptBuffer: Uint8Array | null;
 
-let namespace: PyProxy;
 let await_fut: PyProxyCallable;
 let repr_shorten: PyProxyCallable;
 let pyconsole: PyProxy;
 let clear_console: PyProxyCallable;
+let create_console: PyProxyCallable;
 
 const PS1 = '\u001b[32;1m>>> \u001b[0m' as const;
 const PS2 = '\u001b[32m... \u001b[0m' as const;
@@ -48,17 +49,24 @@ const post = {
   promptPending: () => post.write(PS2),
 };
 
+const setUpConsole = (globals?: PyProxyDict) => {
+  pyconsole?.destroy();
+  pyconsole = create_console(globals);
+};
+
 const setUpREPLEnvironment = () => {
-  namespace = pyodide.globals.get('dict')();
+  const globals = pyodide.globals.get('dict')();
 
-  pyodide.runPython(consoleScript, { globals: namespace });
+  pyodide.runPython(consoleScript, { globals });
 
-  repr_shorten = namespace.get('repr_shorten');
-  await_fut = namespace.get('await_fut');
-  pyconsole = namespace.get('pyconsole');
-  clear_console = namespace.get('clear_console');
+  repr_shorten = globals.get('repr_shorten');
+  await_fut = globals.get('await_fut');
+  create_console = globals.get('create_console');
+  clear_console = globals.get('clear_console');
 
-  return namespace.get('BANNER') as string;
+  setUpConsole();
+
+  return globals.get('BANNER') as string;
 };
 
 const preparePyodide = async () => {
@@ -111,12 +119,16 @@ const listeners = {
       prepareExports(exports);
       await pyodide.loadPackagesFromImports(code);
 
+      const globals = pyodide.globals.get('dict')();
+
       /**
        * `await pyodide.runPythonAsync(code)` is not used because it raises
        * an uncatchable `PythonError` when Pyodide emits a `KeyboardInterrupt`.
        * @see https://github.com/pyodide/pyodide/issues/2141
        */
-      const result = pyodide.runPython(code);
+      const result = pyodide.runPython(code, { globals });
+
+      setUpConsole(globals);
 
       post.writeln(result?.toString());
     } catch (error) {
@@ -147,7 +159,7 @@ const listeners = {
 
   replClear: async () => {
     try {
-      clear_console();
+      clear_console(pyconsole);
       await await_fut(pyconsole.push(''));
     } finally {
       post.error('\nKeyboardInterrupt');

@@ -14,3 +14,5 @@ declare module '*.py' {
   const script: string;
   export default script;
 }
+
+declare const __VERSION__: string;

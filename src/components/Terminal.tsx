@@ -9,11 +9,13 @@ import {
 import { StopIcon } from '@heroicons/react/24/outline';
 import { slate, yellow } from 'tailwindcss/colors';
 import { Terminal as Xterm } from 'xterm';
+import { CanvasAddon } from 'xterm-addon-canvas';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebglAddon } from 'xterm-addon-webgl';
 
 import Button from './Button';
 import Prompt from './Prompt';
+import TerminalMenu from './TerminalMenu';
 import 'xterm/css/xterm.css';
 
 interface TerminalRef {
@@ -24,13 +26,35 @@ interface TerminalRef {
 }
 
 interface TerminalProps {
-  onCtrlC?: () => void;
+  onStop?: () => void;
   onReturn?: (line: string) => void;
+  onRestart?: () => void;
   showStopButton?: boolean;
 }
 
 const isASCIIPrintable = (character: string): boolean =>
   character >= String.fromCharCode(32) && character <= String.fromCharCode(126);
+
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+/**
+ * @see https://github.com/xtermjs/xterm.js/pull/4255
+ */
+const getSafariVersion = (): number => {
+  if (!isSafari) return 0;
+
+  const majorVersion = navigator.userAgent.match(/Version\/(\d+)/);
+  if (majorVersion === null || majorVersion.length < 2) return 0;
+
+  return parseInt(majorVersion[1]);
+};
+
+const isWebGL2Compatible = (): boolean => {
+  const context = document.createElement('canvas').getContext('webgl2');
+  const isWebGL2Available = Boolean(context);
+
+  return isWebGL2Available && (isSafari ? getSafariVersion() >= 16 : true);
+};
 
 const Terminal = forwardRef<TerminalRef, TerminalProps>(
   (props, ref): JSX.Element => {
@@ -68,7 +92,12 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
 
       const fitAddon = new FitAddon();
       xterm.loadAddon(fitAddon);
-      xterm.loadAddon(new WebglAddon());
+
+      if (isWebGL2Compatible()) {
+        xterm.loadAddon(new WebglAddon());
+      } else {
+        xterm.loadAddon(new CanvasAddon());
+      }
 
       xterm.onKey(({ key }) => {
         if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
@@ -114,31 +143,31 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     }));
 
     return (
-      <section ref={containerRef} className="windowed h-full w-full">
-        <div ref={terminalRef} className="h-full" />
+      <section ref={containerRef} className="relative h-full w-full">
+        <div ref={terminalRef} className="windowed h-full" />
 
-        <div className="absolute bottom-0 left-0 z-10 w-full px-2 pb-2">
-          {!props.showStopButton && (
-            <Prompt
-              ref={promptRef}
-              onCtrlC={() => {
-                props.onCtrlC?.();
-                xtermRef.current?.scrollToBottom();
-              }}
-              onF2={() => {
-                xtermRef.current?.clear();
-              }}
-              onReturn={(input) => {
-                props.onReturn?.(input);
-                xtermRef.current?.scrollToBottom();
-              }}
-            />
-          )}
+        <div className="absolute bottom-0 left-0 z-40 flex w-full space-x-2 px-2 pb-2">
+          <Prompt
+            ref={promptRef}
+            onReturn={(input) => {
+              props.onReturn?.(input);
+              xtermRef.current?.scrollToBottom();
+            }}
+          />
+
+          <TerminalMenu
+            onClickClearConsole={() => xtermRef.current?.clear()}
+            onClickForceStop={() => {
+              props.onStop?.();
+              xtermRef.current?.scrollToBottom();
+            }}
+            onClickRestart={props.onRestart}
+          />
         </div>
 
         {props.showStopButton && (
           <div className="absolute right-3 top-3 z-20 space-x-2 opacity-50 hover:opacity-100">
-            <Button icon={StopIcon} onClick={props.onCtrlC}>
+            <Button icon={StopIcon} onClick={props.onStop}>
               Stop
             </Button>
           </div>

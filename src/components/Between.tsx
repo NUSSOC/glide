@@ -43,6 +43,19 @@ const Between = (props: BetweenProps): JSX.Element => {
 
   const [direction, setDirection] = useState<Direction>('vertical');
 
+  useLayoutEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries.length) return;
+
+      const { width } = entries[0].contentRect;
+      setDirection(width >= 1024 ? 'horizontal' : 'vertical');
+    });
+
+    resizeObserver.observe(document.body);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
   /**
    * This patch is needed to properly support reactive direction changes.
    * As of time of writing, the gutter and children `div`s are not properly

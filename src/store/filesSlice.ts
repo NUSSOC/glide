@@ -6,14 +6,12 @@ import { RootState } from '.';
 interface FilesState {
   files: Record<string, string>;
   list: string[];
-  exports: string[];
   selected?: string;
 }
 
 const initialState: FilesState = {
   files: {},
   list: [],
-  exports: [],
 };
 
 const findSuitableName = (
@@ -103,15 +101,6 @@ export const filesSlice = createSlice({
 
       if (state.selected === oldName) state.selected = newName;
     },
-    toggleExport: (state, action: PayloadAction<string>) => {
-      const exports = new Set(state.exports);
-      if (exports.has(action.payload)) {
-        exports.delete(action.payload);
-      } else {
-        exports.add(action.payload);
-      }
-      state.exports = Array.from(exports);
-    },
   },
 });
 
@@ -126,15 +115,6 @@ export const getSelectedFile = createSelector(selectFiles, (files) =>
   files.selected
     ? { name: files.selected, content: files.files[files.selected] }
     : { name: undefined, content: undefined },
-);
-
-export const getExportsNameSet = createSelector(
-  selectFiles,
-  (files) => new Set(files.exports),
-);
-
-export const getExports = createSelector(selectFiles, (files) =>
-  files.exports.map((name) => ({ name, content: files.files[name] })),
 );
 
 export const filesActions = filesSlice.actions;

@@ -15,7 +15,6 @@ interface UseFilesMutationsHook {
   select: (name: string) => void;
   update: (content: string) => void;
   create: (name: string, content: string) => void;
-  toggleExport: (name: string) => void;
 }
 
 const useFilesMutations = (): UseFilesMutationsHook => {
@@ -50,9 +49,8 @@ const useFilesMutations = (): UseFilesMutationsHook => {
     },
     create: (name: string, content: string) => {
       dispatch(filesActions.create({ name, content }));
-    },
-    toggleExport: (name: string) => {
-      dispatch(filesActions.toggleExport(name));
+      dispatch(vaultActions.save({ name, content }));
+      persistor.flush();
     },
   };
 };

@@ -11,7 +11,7 @@ import Library from './Library';
 const isMac = navigator.platform.startsWith('Mac');
 
 const Navigator = (): JSX.Element => {
-  const [openLibrary, setOpenLibrary] = useState(false);
+  const [openLibrary, setOpenLibrary] = useState(true);
   const name = useFile.SelectedName();
 
   const handleShortcut = (e: KeyboardEvent) => {

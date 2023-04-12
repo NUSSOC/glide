@@ -8,12 +8,16 @@
   }
 }
 
+.gutter {
+  @apply rounded transition hover:bg-lime-400;
+}
+
 .gutter.gutter-horizontal {
-  @apply cursor-col-resize;
+  @apply cursor-col-resize hover:scale-x-50 active:scale-x-75;
 }
 
 .gutter.gutter-vertical {
-  @apply cursor-row-resize;
+  @apply cursor-row-resize hover:scale-y-50 active:scale-y-75;
 }
 
 .xterm {

@@ -1,10 +1,6 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  ArrowUpTrayIcon,
-  CubeIcon,
-  PlusIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
@@ -25,7 +21,7 @@ const Library = (props: LibraryProps): JSX.Element => {
 
   return (
     <Transition appear as={Fragment} show={props.open}>
-      <Dialog className="relative z-10" onClose={props.onClose}>
+      <Dialog className="relative z-40" onClose={props.onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-100"
@@ -50,24 +46,20 @@ const Library = (props: LibraryProps): JSX.Element => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-slate-800 p-5 text-left align-middle shadow-xl ring-2 ring-slate-700 transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-white"
-                >
-                  Library
-                </Dialog.Title>
+                <div className="flex justify-between">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-white"
+                  >
+                    Library
+                  </Dialog.Title>
 
-                {Boolean(files.length) && (
-                  <div className="mt-2">
-                    <p className="align-middle text-sm text-slate-400">
-                      To make a file accessible in Python, activate its
-                      <CubeIcon className="mx-1 inline h-7 rounded bg-blue-600/10 p-1 text-blue-400" />
-                      button.
-                    </p>
-                  </div>
-                )}
+                  <p className="select-none text-sm text-slate-600">
+                    {__VERSION__}
+                  </p>
+                </div>
 
-                <div className="mt-4 flex flex-col space-y-2">
+                <div className="mt-6 flex flex-col space-y-2">
                   {files.map(({ name, unsaved }) => (
                     <FileItem
                       key={name}
@@ -93,6 +85,7 @@ const Library = (props: LibraryProps): JSX.Element => {
                     icon={ArrowUpTrayIcon}
                     onUpload={(name, content) => {
                       if (content === null) return;
+
                       create(name, content);
                       props.onClose();
                     }}

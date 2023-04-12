@@ -17,8 +17,6 @@ const FileUploader = (props: FileUploaderProps): JSX.Element => {
 
     const file = Array.from(files)[0];
 
-    console.log(file.type);
-
     const reader = new FileReader();
     reader.onload = ({ target }) =>
       props.onUpload?.(file.name, target?.result as string);
