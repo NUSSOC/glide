@@ -41,6 +41,11 @@ const RenamableInput = (props: RenamableInputProps): JSX.Element => {
         )
           return;
 
+        /**
+         * @see https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+         */
+        newName = newName.replace(/[/\\?%*:|"<>]/g, '_');
+
         props.onConfirm(newName);
       }}
       onChange={(e) => setNewFileName(e.target.value)}
