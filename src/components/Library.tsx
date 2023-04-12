@@ -79,6 +79,7 @@ const Library = (props: LibraryProps): JSX.Element => {
                     icon={ArrowUpTrayIcon}
                     onUpload={(name, content) => {
                       if (content === null) return;
+
                       create(name, content);
                       props.onClose();
                     }}
