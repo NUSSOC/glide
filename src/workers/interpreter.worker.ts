@@ -106,6 +106,24 @@ const prepareExports = (exports?: { name: string; content: string }[]) => {
   });
 };
 
+/**
+ * Pyodide may sometimes not catch `RecursionError`s and excessively
+ * recursive code spills as JavaScript `RangeError`, causing Pyodide to
+ * fatally crash. We need to restart Pyodide in this case.
+ * @see https://github.com/pyodide/pyodide/issues/951
+ */
+const handleRangeErrorAndRestartPyodide = async (error: unknown) => {
+  if (!(error instanceof RangeError)) return;
+
+  post.system(
+    '\nOops, something happened and we have to restart the interpreter. ' +
+      "Don't worry, it's not your fault. " +
+      'You may continue once you see the prompt again.\n',
+  );
+
+  await preparePyodide();
+};
+
 const listeners = {
   initialize: async (newInterruptBuffer?: Uint8Array) => {
     pyodide ??= await preparePyodide();
@@ -138,25 +156,10 @@ const listeners = {
 
       post.writeln(result?.toString());
     } catch (error) {
-      if (error instanceof Error) {
-        post.error(error.message);
-      }
+      if (!(error instanceof Error)) throw error;
 
-      /**
-       * Pyodide may sometimes not catch `RecursionError`s and excessively
-       * recursive code spills as JavaScript `RangeError`, causing Pyodide to
-       * fatally crash. We need to restart Pyodide in this case.
-       * @see https://github.com/pyodide/pyodide/issues/951
-       */
-      if (error instanceof RangeError) {
-        post.system(
-          "\nOops, something happened and we have to restart the interpreter. Don't worry, it's not your fault. You may continue once you see the prompt again.\n",
-        );
-
-        await preparePyodide();
-      }
-
-      throw error;
+      post.error(error.message);
+      handleRangeErrorAndRestartPyodide(error);
     } finally {
       post.prompt();
       post.unlock();
@@ -215,6 +218,8 @@ const listeners = {
 
       const message = future.formatted_error || error.message;
       post.error(message.trimEnd());
+
+      handleRangeErrorAndRestartPyodide(error);
     } finally {
       post.prompt();
       future.destroy();
