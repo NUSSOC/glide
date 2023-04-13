@@ -2,6 +2,9 @@ from pyodide.ffi import to_js
 from pyodide.console import PyodideConsole, repr_shorten, BANNER
 import __main__
 import builtins
+import sys
+
+del sys.modules['js']
 
 async def await_fut(fut):
   result = await fut

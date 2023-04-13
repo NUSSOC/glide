@@ -77,6 +77,12 @@ const preparePyodide = async () => {
 
   if (interruptBuffer) pyodide.setInterruptBuffer(interruptBuffer);
 
+  /**
+   * Replaces Pyodide's `js` import with a stub `object`. This must also be
+   * paired with some `del sys.modules['js']` in Pyodide's initialisation.
+   */
+  pyodide.registerJsModule('js', {});
+
   const banner = setUpREPLEnvironment();
   post.writeln(banner);
   post.prompt(false);
