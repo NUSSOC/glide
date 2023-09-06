@@ -45,6 +45,9 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
 
         <input
           ref={inputRef}
+          autoCapitalize="off"
+          autoComplete="off"
+          autoCorrect="off"
           className="w-full bg-transparent py-2 pr-2 font-mono text-sm outline-none"
           onChange={(e) => {
             setCommand({ dirty: true, command: e.target.value });
@@ -76,6 +79,7 @@ const Prompt = forwardRef<PromptRef, PromptProps>((props, ref): JSX.Element => {
               setCommand({ dirty: false, command: history.next() ?? '' });
             }
           }}
+          spellCheck={false}
           value={command}
         />
       </div>
