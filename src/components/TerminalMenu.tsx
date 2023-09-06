@@ -2,8 +2,7 @@ import {
   ElementType,
   Fragment,
   MouseEventHandler,
-  ReactNode,
-  SVGProps,
+  ReactNode
 } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import {
@@ -23,7 +22,7 @@ interface MenuItemProps {
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
-  icon?: ElementType<SVGProps<SVGSVGElement>>;
+  icon?: ElementType;
   iconClassName?: string;
 }
 

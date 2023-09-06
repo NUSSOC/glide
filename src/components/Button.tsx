@@ -1,7 +1,7 @@
-import { ComponentProps, ElementType, SVGProps } from 'react';
+import { ComponentProps, ElementType } from 'react';
 
 interface ButtonProps extends ComponentProps<'button'> {
-  icon?: ElementType<SVGProps<SVGSVGElement>>;
+  icon?: ElementType;
 }
 
 const Button = (props: ButtonProps): JSX.Element => {

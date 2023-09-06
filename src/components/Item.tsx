@@ -1,7 +1,7 @@
-import { ComponentProps, ElementType, SVGProps } from 'react';
+import { ComponentProps, ElementType } from 'react';
 
 interface ItemProps extends ComponentProps<'div'> {
-  icon?: ElementType<SVGProps<SVGSVGElement>>;
+  icon?: ElementType;
   iconClassName?: string;
   labelClassName?: string;
   selected?: boolean;
