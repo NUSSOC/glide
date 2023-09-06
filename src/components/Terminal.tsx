@@ -5,8 +5,9 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
-import { StopIcon } from '@heroicons/react/24/outline';
+import { DocumentDuplicateIcon, StopIcon } from '@heroicons/react/24/outline';
 import { slate, yellow } from 'tailwindcss/colors';
 import { Terminal as Xterm } from 'xterm';
 import { CanvasAddon } from 'xterm-addon-canvas';
@@ -17,6 +18,11 @@ import Button from './Button';
 import Prompt from './Prompt';
 import TerminalMenu from './TerminalMenu';
 import 'xterm/css/xterm.css';
+
+interface Position {
+  x: number;
+  y: number;
+}
 
 interface TerminalRef {
   append: (result?: string) => void;
@@ -64,6 +70,9 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
 
+    const [selection, setSelection] = useState<string>();
+    const [selectionPosition, setSelectionPosition] = useState<Position>();
+
     useLayoutEffect(() => {
       const container = containerRef.current;
       if (!container) return;
@@ -98,6 +107,8 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       } else {
         xterm.loadAddon(new CanvasAddon());
       }
+
+      xterm.onSelectionChange(() => setSelection(xterm.getSelection()));
 
       xterm.onKey(({ key }) => {
         if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
@@ -142,9 +153,25 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
         write('\u001b[33m' + (result ?? '') + '\u001b[0m'),
     }));
 
+    const copySelectionToClipboard = () => {
+      if (!selection) return;
+
+      navigator.clipboard.writeText(selection);
+    };
+
     return (
       <section ref={containerRef} className="relative h-full w-full">
-        <div ref={terminalRef} className="windowed h-full" />
+        <div
+          ref={terminalRef}
+          className="windowed h-full"
+          onMouseUp={(e) => {
+            const rectangle = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rectangle.left;
+            const y = e.clientY - rectangle.top;
+
+            setSelectionPosition({ x, y });
+          }}
+        />
 
         <div className="absolute bottom-0 left-0 z-40 flex w-full space-x-2 px-2 pb-2">
           <Prompt
@@ -164,6 +191,23 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
             onClickRestart={props.onRestart}
           />
         </div>
+
+        {selection && selectionPosition && (
+          <div
+            className="absolute z-20 opacity-20 hover:opacity-50"
+            style={{
+              left: selectionPosition.x + 5,
+              top: selectionPosition.y - 10,
+            }}
+          >
+            <Button
+              icon={DocumentDuplicateIcon}
+              onClick={copySelectionToClipboard}
+            >
+              Copy
+            </Button>
+          </div>
+        )}
 
         {props.showStopButton && (
           <div className="absolute right-3 top-3 z-20 space-x-2 opacity-50 hover:opacity-100">
