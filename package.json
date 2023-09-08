@@ -27,7 +27,7 @@
     "xterm-addon-webgl": "^0.15.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.3",
+    "@babel/core": "^7.22.17",
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.21.0",
