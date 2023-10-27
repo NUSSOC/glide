@@ -2,6 +2,8 @@ version: 2.1
 
 jobs:
   say-hello:
+    circleci_ip_ranges: true
+    
     docker:
       - image: cimg/base:stable
 
