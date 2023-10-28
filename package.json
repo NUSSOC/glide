@@ -8,7 +8,7 @@
     "build": "webpack --config webpack.prod.js"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.13",
+    "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@monaco-editor/react": "^4.4.6",
     "@reduxjs/toolkit": "^1.9.5",
