@@ -95,6 +95,7 @@ const FileName = (): JSX.Element => {
       )}
 
       <Transition
+        as="div"
         enter="transition-transform origin-left duration-75"
         enterFrom="scale-0"
         enterTo="scale-100"

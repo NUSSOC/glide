@@ -1,10 +1,11 @@
+import { ElementType, MouseEventHandler, ReactNode } from 'react';
 import {
-  ElementType,
-  Fragment,
-  MouseEventHandler,
-  ReactNode
-} from 'react';
-import { Menu, Transition } from '@headlessui/react';
+  Menu,
+  MenuButton,
+  MenuItem as HMenuItem,
+  MenuItems,
+  Transition,
+} from '@headlessui/react';
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -27,11 +28,11 @@ interface MenuItemProps {
 }
 
 const MenuItem = (props: MenuItemProps): JSX.Element => (
-  <Menu.Item>
-    {({ active }) => (
+  <HMenuItem>
+    {({ focus }) => (
       <button
         className={`${
-          active ? 'bg-blue-200 text-blue-900' : 'text-white'
+          focus ? 'bg-blue-200 text-blue-900' : 'text-white'
         } group flex w-full items-center whitespace-nowrap rounded-md p-2 text-sm ${
           props.className ?? ''
         }`}
@@ -47,24 +48,23 @@ const MenuItem = (props: MenuItemProps): JSX.Element => (
         {props.children}
       </button>
     )}
-  </Menu.Item>
+  </HMenuItem>
 );
 
 const MenuHeader = (props: { children: ReactNode }): JSX.Element => (
-  <Menu.Item as="p" className="px-2 py-1 text-xs text-slate-400">
+  <HMenuItem as="p" className="px-2 py-1 text-xs text-slate-400">
     {props.children}
-  </Menu.Item>
+  </HMenuItem>
 );
 
 const TerminalMenu = (props: TerminalMenuProps): JSX.Element => {
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="rounded-md bg-slate-500 bg-opacity-20 p-2 transition-transform hover:bg-opacity-30 active:scale-95">
+      <MenuButton className="rounded-md bg-slate-500 bg-opacity-20 p-2 transition-transform hover:bg-opacity-30 active:scale-95">
         <Bars3Icon aria-hidden="true" className="h-5 w-5" />
-      </Menu.Button>
+      </MenuButton>
 
       <Transition
-        as={Fragment}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -72,7 +72,7 @@ const TerminalMenu = (props: TerminalMenuProps): JSX.Element => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute bottom-11 right-0 z-40 origin-bottom-right divide-y-2 divide-slate-700 rounded-md bg-slate-800 shadow-2xl ring-2 ring-slate-700">
+        <MenuItems className="absolute bottom-11 right-0 z-40 origin-bottom-right divide-y-2 divide-slate-700 rounded-md bg-slate-800 shadow-2xl ring-2 ring-slate-700">
           <div className="px-1 py-1">
             <MenuHeader>Interpreter</MenuHeader>
 
@@ -92,7 +92,7 @@ const TerminalMenu = (props: TerminalMenuProps): JSX.Element => {
               Clear output
             </MenuItem>
           </div>
-        </Menu.Items>
+        </MenuItems>
       </Transition>
     </Menu>
   );
