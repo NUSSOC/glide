@@ -9,7 +9,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.18",
-    "@monaco-editor/react": "^4.4.6",
+    "@monaco-editor/react": "^4.7.0",
     "@reduxjs/toolkit": "^2.6.1",
     "@xterm/addon-canvas": "^0.7.0",
     "@xterm/addon-fit": "^0.10.0",
@@ -17,7 +17,7 @@
     "@xterm/xterm": "^5.5.0",
     "immer": "^9.0.21",
     "localforage": "^1.10.0",
-    "monaco-editor": "^0.36.1",
+    "monaco-editor": "^0.52.2",
     "pyodide": "^0.22.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
