@@ -1,4 +1,4 @@
-import { ChangeEventHandler, ComponentProps } from 'react';
+import { ChangeEventHandler, ComponentProps, JSX } from 'react';
 
 import Button from './Button';
 

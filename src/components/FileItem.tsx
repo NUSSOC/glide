@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { JSX, useRef } from 'react';
 import { ArrowRightIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 import useFile from '../hooks/useFile';

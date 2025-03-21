@@ -1,4 +1,4 @@
-import { ElementType, MouseEventHandler, ReactNode } from 'react';
+import { ElementType, JSX, MouseEventHandler, ReactNode } from 'react';
 import {
   Menu,
   MenuButton,

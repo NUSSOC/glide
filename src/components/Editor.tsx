@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { JSX, useEffect, useLayoutEffect, useRef } from 'react';
 import { PlayIcon } from '@heroicons/react/24/outline';
 import MonacoEditor from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
@@ -21,7 +21,7 @@ interface CoreEditorProps extends EditorProps {
 }
 
 const CoreEditor = (props: CoreEditorProps): JSX.Element => {
-  const ref = useRef<editor.IStandaloneCodeEditor>();
+  const ref = useRef<editor.IStandaloneCodeEditor>(null);
 
   const handleShortcut = (e: KeyboardEvent) => {
     const isMod = navigator.platform.startsWith('Mac') ? e.metaKey : e.ctrlKey;

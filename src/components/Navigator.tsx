@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
 
 import useFile from '../hooks/useFile';

@@ -1,4 +1,4 @@
-import { ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import { JSX, ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import Split from 'react-split';
 
 interface BetweenProps {

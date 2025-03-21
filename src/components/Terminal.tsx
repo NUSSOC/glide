@@ -1,6 +1,8 @@
 import {
   ComponentRef,
-  forwardRef,
+  JSX,
+  Ref,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -31,6 +33,7 @@ interface TerminalRef {
 }
 
 interface TerminalProps {
+  ref?: Ref<TerminalRef>;
   onStop?: () => void;
   onReturn?: (line: string) => void;
   onRestart?: () => void;
@@ -61,155 +64,155 @@ const isWebGL2Compatible = (): boolean => {
   return isWebGL2Available && (isSafari ? getSafariVersion() >= 16 : true);
 };
 
-const Terminal = forwardRef<TerminalRef, TerminalProps>(
-  (props, ref): JSX.Element => {
-    const xtermRef = useRef<Xterm>();
-    const terminalRef = useRef<HTMLDivElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
+const Terminal = (props: TerminalProps): JSX.Element => {
+  const xtermRef = useRef<Xterm>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
 
-    const [selection, setSelection] = useState<string>();
-    const [selectionPosition, setSelectionPosition] = useState<Position>();
+  const [selection, setSelection] = useState<string>();
+  const [selectionPosition, setSelectionPosition] = useState<Position>();
 
-    useEffect(() => {
-      const terminal = terminalRef.current;
-      const container = containerRef.current;
-      if (!terminal || !container) return;
+  useEffect(() => {
+    const terminal = terminalRef.current;
+    const container = containerRef.current;
+    if (!terminal || !container) return;
 
-      const xterm = new Xterm({
-        cursorBlink: false,
-        cursorStyle: 'underline',
-        fontFamily: 'monospace',
-        fontSize: 14,
-        theme: { background: slate[900], cursor: yellow[400] },
-        disableStdin: true,
-      });
+    const xterm = new Xterm({
+      cursorBlink: false,
+      cursorStyle: 'underline',
+      fontFamily: 'monospace',
+      fontSize: 14,
+      theme: { background: slate[900], cursor: yellow[400] },
+      disableStdin: true,
+    });
 
-      const fitAddon = new FitAddon();
-      xterm.loadAddon(fitAddon);
+    const fitAddon = new FitAddon();
+    xterm.loadAddon(fitAddon);
 
-      if (isWebGL2Compatible()) {
-        xterm.loadAddon(new WebglAddon());
-      } else {
-        xterm.loadAddon(new CanvasAddon());
-      }
+    if (isWebGL2Compatible()) {
+      xterm.loadAddon(new WebglAddon());
+    } else {
+      xterm.loadAddon(new CanvasAddon());
+    }
 
-      xterm.onSelectionChange(() => setSelection(xterm.getSelection()));
+    xterm.onSelectionChange(() => setSelection(xterm.getSelection()));
 
-      xterm.onKey(({ key }) => {
-        if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
+    xterm.onKey(({ key }) => {
+      if (!(isASCIIPrintable(key) || key >= '\u00a0')) return;
 
-        promptRef.current?.focusWith(key);
-      });
+      promptRef.current?.focusWith(key);
+    });
 
-      xterm.open(terminal);
-      xtermRef.current = xterm;
+    xterm.open(terminal);
+    xtermRef.current = xterm;
 
-      const resizeObserver = new ResizeObserver(() => fitAddon.fit());
-      resizeObserver.observe(container);
+    const resizeObserver = new ResizeObserver(() => fitAddon.fit());
+    resizeObserver.observe(container);
 
-      return () => {
-        xterm.dispose();
-        resizeObserver.disconnect();
-      };
-    }, []);
-
-    const write = (text: string, line = true) => {
-      const trimmed = text.replace(/\n/g, '\r\n');
-      const xterm = xtermRef.current;
-      if (!xterm) return;
-
-      const writer = (text: string) =>
-        line ? xterm.writeln(text) : xterm.write(text);
-
-      try {
-        writer(trimmed);
-      } catch (error) {
-        if (!(error instanceof Error)) throw error;
-
-        console.log('oops', error.message);
-        xterm.clear();
-        writer(trimmed);
-      }
+    return () => {
+      xterm.dispose();
+      resizeObserver.disconnect();
     };
+  }, []);
 
-    useImperativeHandle(ref, () => ({
+  const write = useCallback((text: string, line = true) => {
+    const trimmed = text.replace(/\n/g, '\r\n');
+    const xterm = xtermRef.current;
+    if (!xterm) return;
+
+    const writer = (text: string) =>
+      line ? xterm.writeln(text) : xterm.write(text);
+
+    try {
+      writer(trimmed);
+    } catch (error) {
+      if (!(error instanceof Error)) throw error;
+
+      console.log('oops', error.message);
+      xterm.clear();
+      writer(trimmed);
+    }
+  }, []);
+
+  useImperativeHandle(
+    props.ref,
+    () => ({
       append: (result?: string) => write(result ?? ''),
       write: (result?: string) => write(result ?? '', false),
       error: (result?: string) =>
         write('\u001b[31m' + (result ?? '') + '\u001b[0m'),
       system: (result?: string) =>
         write('\u001b[33m' + (result ?? '') + '\u001b[0m'),
-    }));
+    }),
+    [write],
+  );
 
-    const copySelectionToClipboard = () => {
-      if (!selection) return;
+  const copySelectionToClipboard = () => {
+    if (!selection) return;
 
-      navigator.clipboard.writeText(selection);
-    };
+    navigator.clipboard.writeText(selection);
+  };
 
-    return (
-      <section ref={containerRef} className="relative h-full w-full">
-        <div
-          ref={terminalRef}
-          className="windowed h-full"
-          onMouseUp={(e) => {
-            const rectangle = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rectangle.left;
-            const y = e.clientY - rectangle.top;
+  return (
+    <section ref={containerRef} className="relative h-full w-full">
+      <div
+        ref={terminalRef}
+        className="windowed h-full"
+        onMouseUp={(e) => {
+          const rectangle = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rectangle.left;
+          const y = e.clientY - rectangle.top;
 
-            setSelectionPosition({ x, y });
+          setSelectionPosition({ x, y });
+        }}
+      />
+
+      <div className="absolute bottom-0 left-0 z-40 flex w-full space-x-2 px-2 pb-2">
+        <Prompt
+          ref={promptRef}
+          onReturn={(input) => {
+            props.onReturn?.(input);
+            xtermRef.current?.scrollToBottom();
           }}
         />
 
-        <div className="absolute bottom-0 left-0 z-40 flex w-full space-x-2 px-2 pb-2">
-          <Prompt
-            ref={promptRef}
-            onReturn={(input) => {
-              props.onReturn?.(input);
-              xtermRef.current?.scrollToBottom();
-            }}
-          />
+        <TerminalMenu
+          onClickClearConsole={() => xtermRef.current?.clear()}
+          onClickForceStop={() => {
+            props.onStop?.();
+            xtermRef.current?.scrollToBottom();
+          }}
+          onClickRestart={props.onRestart}
+        />
+      </div>
 
-          <TerminalMenu
-            onClickClearConsole={() => xtermRef.current?.clear()}
-            onClickForceStop={() => {
-              props.onStop?.();
-              xtermRef.current?.scrollToBottom();
-            }}
-            onClickRestart={props.onRestart}
-          />
-        </div>
-
-        {selection && selectionPosition && (
-          <div
-            className="absolute z-20 opacity-20 hover:opacity-50"
-            style={{
-              left: selectionPosition.x + 5,
-              top: selectionPosition.y - 10,
-            }}
+      {selection && selectionPosition && (
+        <div
+          className="absolute z-20 opacity-20 hover:opacity-50"
+          style={{
+            left: selectionPosition.x + 5,
+            top: selectionPosition.y - 10,
+          }}
+        >
+          <Button
+            icon={DocumentDuplicateIcon}
+            onClick={copySelectionToClipboard}
           >
-            <Button
-              icon={DocumentDuplicateIcon}
-              onClick={copySelectionToClipboard}
-            >
-              Copy
-            </Button>
-          </div>
-        )}
+            Copy
+          </Button>
+        </div>
+      )}
 
-        {props.showStopButton && (
-          <div className="absolute right-3 top-3 z-20 space-x-2 opacity-50 hover:opacity-100">
-            <Button icon={StopIcon} onClick={props.onStop}>
-              Stop
-            </Button>
-          </div>
-        )}
-      </section>
-    );
-  },
-);
-
-Terminal.displayName = 'Terminal';
+      {props.showStopButton && (
+        <div className="absolute right-3 top-3 z-20 space-x-2 opacity-50 hover:opacity-100">
+          <Button icon={StopIcon} onClick={props.onStop}>
+            Stop
+          </Button>
+        </div>
+      )}
+    </section>
+  );
+};
 
 export default Terminal;

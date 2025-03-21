@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { Transition } from '@headlessui/react';
 
 import useFile from '../hooks/useFile';

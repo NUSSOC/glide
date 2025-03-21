@@ -1,4 +1,4 @@
-import { ComponentProps, ElementType } from 'react';
+import { ComponentProps, ElementType, JSX } from 'react';
 
 interface ItemProps extends ComponentProps<'div'> {
   icon?: ElementType;

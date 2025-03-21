@@ -1,4 +1,4 @@
-import { ComponentRef, useRef, useState } from 'react';
+import { ComponentRef, JSX, useRef, useState } from 'react';
 
 import Between from '../components/Between';
 import Editor from '../components/Editor';

@@ -23,8 +23,8 @@ interface Message<L extends Record<string, any>> {
 }
 
 const useInterpreter = (callbacks: Callbacks): Interpreter => {
-  const workerRef = useRef<Worker>();
-  const interruptBufferRef = useRef<Uint8Array>();
+  const workerRef = useRef<Worker>(null);
+  const interruptBufferRef = useRef<Uint8Array>(null);
 
   const setUpInterpreterWorker = () => {
     const worker = new Worker(
