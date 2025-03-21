@@ -11,6 +11,10 @@
     "@heroicons/react": "^2.0.18",
     "@monaco-editor/react": "^4.4.6",
     "@reduxjs/toolkit": "^2.6.1",
+    "@xterm/addon-canvas": "^0.7.0",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-webgl": "^0.18.0",
+    "@xterm/xterm": "^5.5.0",
     "immer": "^9.0.21",
     "localforage": "^1.10.0",
     "monaco-editor": "^0.36.1",
@@ -19,11 +23,7 @@
     "react-dom": "^18.2.0",
     "react-redux": "^9.2.0",
     "react-split": "^2.0.14",
-    "redux-persist": "^6.0.0",
-    "xterm": "^5.1.0",
-    "xterm-addon-canvas": "^0.3.0",
-    "xterm-addon-fit": "^0.7.0",
-    "xterm-addon-webgl": "^0.15.0"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",

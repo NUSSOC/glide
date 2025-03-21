@@ -8,16 +8,16 @@ import {
   useState,
 } from 'react';
 import { DocumentDuplicateIcon, StopIcon } from '@heroicons/react/24/outline';
+import { CanvasAddon } from '@xterm/addon-canvas';
+import { FitAddon } from '@xterm/addon-fit';
+import { WebglAddon } from '@xterm/addon-webgl';
+import { Terminal as Xterm } from '@xterm/xterm';
 import { slate, yellow } from 'tailwindcss/colors';
-import { Terminal as Xterm } from 'xterm';
-import { CanvasAddon } from 'xterm-addon-canvas';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebglAddon } from 'xterm-addon-webgl';
 
 import Button from './Button';
 import Prompt from './Prompt';
 import TerminalMenu from './TerminalMenu';
-import 'xterm/css/xterm.css';
+import '@xterm/xterm/css/xterm.css';
 
 interface Position {
   x: number;
