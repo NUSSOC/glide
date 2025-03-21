@@ -8,6 +8,7 @@ import {
 } from '@headlessui/react';
 import { ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline';
 
+import githubIconSrc from '../assets/github-white.svg?url';
 import useFile from '../hooks/useFile';
 import useFilesMutations from '../hooks/useFilesMutations';
 
@@ -75,29 +76,47 @@ const Library = (props: LibraryProps): JSX.Element => {
                   ))}
                 </div>
 
-                <div className="mt-10 space-x-2">
-                  <Button
-                    autoFocus={files.length === 0}
-                    icon={PlusIcon}
-                    onClick={() => {
-                      draft(true);
-                      props.onClose();
-                    }}
-                  >
-                    New File
-                  </Button>
+                <div className="mt-10 space-x-2 flex justify-between">
+                  <div className="space-x-2">
+                    <Button
+                      autoFocus={files.length === 0}
+                      icon={PlusIcon}
+                      onClick={() => {
+                        draft(true);
+                        props.onClose();
+                      }}
+                    >
+                      New File
+                    </Button>
 
-                  <FileUploader
-                    icon={ArrowUpTrayIcon}
-                    onUpload={(name, content) => {
-                      if (content === null) return;
+                    <FileUploader
+                      icon={ArrowUpTrayIcon}
+                      onUpload={(name, content) => {
+                        if (content === null) return;
 
-                      create(name, content);
-                      props.onClose();
-                    }}
+                        create(name, content);
+                        props.onClose();
+                      }}
+                    >
+                      Upload
+                    </FileUploader>
+                  </div>
+
+                  <a
+                    href="https://github.com/NUSSOC/glide"
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
-                    Upload
-                  </FileUploader>
+                    <button className="opacity-40 hover:opacity-100 hover:bg-sky-50/10 inline-flex justify-center rounded-lg px-4 py-2 text-sm font-medium active:scale-95 text-white items-center">
+                      <img
+                        alt="GitHub logo"
+                        className="size-5 -ml-1 mr-2"
+                        src={githubIconSrc}
+                      />
+
+                      <p>Star on GitHub</p>
+                    </button>
+                  </a>
                 </div>
               </DialogPanel>
             </TransitionChild>
