@@ -1,6 +1,7 @@
-import { createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
+import { createSelector } from './utils';
 import { RootState } from '.';
 
 interface FilesState {
@@ -116,6 +117,35 @@ export const getSelectedFile = createSelector(selectFiles, (files) =>
     ? { name: files.selected, content: files.files[files.selected] }
     : { name: undefined, content: undefined },
 );
+
+export const selectNamesSet = createSelector(
+  [(state) => state.files, (state) => state.vault],
+  (files, vault) => new Set(files.list.concat(vault.list)),
+);
+
+export const selectNamesWithUnsaved = createSelector(
+  [(state) => state.files, (state) => state.vault],
+  (files, vault) =>
+    files.list.map((name) => {
+      const fileInFiles = files.files[name];
+      const fileInVault = vault.files[name];
+
+      return { name, unsaved: fileInFiles !== fileInVault };
+    }),
+);
+
+export const selectIsUnsavedOf = (name?: string) =>
+  createSelector(
+    [(state) => state.files, (state) => state.vault],
+    (files, vault) => {
+      if (!name) return true;
+
+      const fileInFiles = files.files[name];
+      const fileInVault = vault.files[name];
+
+      return fileInFiles !== fileInVault;
+    },
+  );
 
 export const filesActions = filesSlice.actions;
 export default filesSlice.reducer;

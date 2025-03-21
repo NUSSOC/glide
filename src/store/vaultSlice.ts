@@ -1,6 +1,7 @@
-import { createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
+import { createSelector } from './utils';
 import { RootState } from '.';
 
 interface File {

@@ -1,33 +1,22 @@
 import { getState } from '../store';
-import { getSelectedFile, getSelectedFileName } from '../store/filesSlice';
+import {
+  getSelectedFile,
+  getSelectedFileName,
+  selectIsUnsavedOf,
+  selectNamesSet,
+  selectNamesWithUnsaved,
+} from '../store/filesSlice';
 import { useAppSelector } from '../store/hooks';
 
 const Selected = () => useAppSelector(getSelectedFile);
 
 const SelectedName = () => useAppSelector(getSelectedFileName);
 
-const NamesSet = () =>
-  useAppSelector(({ files, vault }) => new Set(files.list.concat(vault.list)));
+const NamesSet = () => useAppSelector(selectNamesSet);
 
-const NamesWithUnsaved = () =>
-  useAppSelector(({ files, vault }) =>
-    files.list.map((name) => {
-      const fileInFiles = files.files[name];
-      const fileInVault = vault.files[name];
+const NamesWithUnsaved = () => useAppSelector(selectNamesWithUnsaved);
 
-      return { name, unsaved: fileInFiles !== fileInVault };
-    }),
-  );
-
-const IsUnsavedOf = (name?: string) =>
-  useAppSelector(({ files, vault }) => {
-    if (!name) return true;
-
-    const fileInFiles = files.files[name];
-    const fileInVault = vault.files[name];
-
-    return fileInFiles !== fileInVault;
-  });
+const IsUnsavedOf = (name?: string) => useAppSelector(selectIsUnsavedOf(name));
 
 const Exports = () => {
   const { files, list } = getState().vault;
