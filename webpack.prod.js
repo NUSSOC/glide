@@ -35,6 +35,7 @@ module.exports = merge(common, {
       patterns: [
         resolve(__dirname, 'public/_headers'),
         resolve(__dirname, 'public/.htaccess'),
+        resolve(__dirname, 'public/og.png'),
       ],
     }),
   ],

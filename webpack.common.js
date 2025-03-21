@@ -13,7 +13,10 @@ module.exports = {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: './public/index.html' }),
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      favicon: './public/glide.svg',
+    }),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         diagnosticOptions: {
