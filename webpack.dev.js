@@ -26,6 +26,7 @@ module.exports = merge(common, {
     new ReactRefreshWebpackPlugin(),
     new ESLintWebpackPlugin({
       extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
+      configType: 'eslintrc',
     }),
   ],
   module: {
