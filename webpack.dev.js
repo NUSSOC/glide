@@ -19,6 +19,7 @@ module.exports = merge(common, {
         warnings: false,
       },
     },
+    port: process.env.PORT || 9102,
   },
   plugins: [
     new DefinePlugin({ __VERSION__: JSON.stringify('edge') }),
