@@ -15,6 +15,8 @@ import { WebglAddon } from '@xterm/addon-webgl';
 import { Terminal as Xterm } from '@xterm/xterm';
 import { slate, yellow } from 'tailwindcss/colors';
 
+import ResizeObserver from '../lib/ResizeObserver';
+
 import Button from './Button';
 import Prompt from './Prompt';
 import TerminalMenu from './TerminalMenu';

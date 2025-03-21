@@ -1,6 +1,8 @@
 import { JSX, ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import Split from 'react-split';
 
+import ResizeObserver from '../lib/ResizeObserver';
+
 interface BetweenProps {
   first: ReactNode;
   second: ReactNode;
