@@ -1,6 +1,6 @@
 {
   "name": "glide",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "license": "MIT",
   "scripts": {
     "dev": "webpack serve --config webpack.dev.js",
