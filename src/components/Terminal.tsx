@@ -3,7 +3,6 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -65,7 +64,6 @@ const isWebGL2Compatible = (): boolean => {
 const Terminal = forwardRef<TerminalRef, TerminalProps>(
   (props, ref): JSX.Element => {
     const xtermRef = useRef<Xterm>();
-    const fitAddonRef = useRef<FitAddon>();
     const terminalRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const promptRef = useRef<ComponentRef<typeof Prompt>>(null);
@@ -73,22 +71,10 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
     const [selection, setSelection] = useState<string>();
     const [selectionPosition, setSelectionPosition] = useState<Position>();
 
-    useLayoutEffect(() => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const resizeObserver = new ResizeObserver(() =>
-        fitAddonRef.current?.fit(),
-      );
-
-      resizeObserver.observe(container);
-
-      return () => resizeObserver.disconnect();
-    }, []);
-
     useEffect(() => {
       const terminal = terminalRef.current;
-      if (!terminal) return;
+      const container = containerRef.current;
+      if (!terminal || !container) return;
 
       const xterm = new Xterm({
         cursorBlink: false,
@@ -117,12 +103,15 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>(
       });
 
       xterm.open(terminal);
-      fitAddon.fit();
-
       xtermRef.current = xterm;
-      fitAddonRef.current = fitAddon;
 
-      return () => xterm.dispose();
+      const resizeObserver = new ResizeObserver(() => fitAddon.fit());
+      resizeObserver.observe(container);
+
+      return () => {
+        xterm.dispose();
+        resizeObserver.disconnect();
+      };
     }, []);
 
     const write = (text: string, line = true) => {
