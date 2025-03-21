@@ -10,6 +10,7 @@ interface FileItemProps {
   name: string;
   onClick?: () => void;
   unsaved?: boolean;
+  isFirst?: boolean;
 }
 
 const FileItem = (props: FileItemProps): JSX.Element => {
@@ -19,12 +20,17 @@ const FileItem = (props: FileItemProps): JSX.Element => {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+  const shouldAutoFocus =
+    selectedFileName === undefined
+      ? props.isFirst
+      : props.name === selectedFileName;
+
   return (
     <div className="flex items-center space-x-2">
       <button
         ref={buttonRef}
         className="group flex w-full min-w-0 select-none flex-row items-center justify-between rounded-lg bg-slate-700 p-3 text-slate-100 transition-transform hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 active:scale-95"
-        {...(props.name === selectedFileName && { 'data-autofocus': true })}
+        {...(shouldAutoFocus && { 'data-autofocus': true })}
         onClick={() => {
           select(props.name);
           props.onClick?.();

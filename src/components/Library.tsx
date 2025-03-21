@@ -64,9 +64,10 @@ const Library = (props: LibraryProps): JSX.Element => {
                 </div>
 
                 <div className="mt-6 flex flex-col space-y-2">
-                  {files.map(({ name, unsaved }) => (
+                  {files.map(({ name, unsaved }, index) => (
                     <FileItem
                       key={name}
+                      isFirst={index === 0}
                       name={name}
                       onClick={props.onClose}
                       unsaved={unsaved}
