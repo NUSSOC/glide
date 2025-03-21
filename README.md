@@ -20,6 +20,19 @@ Glide is currently accessible at https://www.comp.nus.edu.sg/~cs1010s/glide. The
 
 Glide's interpreter is powered by [Pyodide](https://pyodide.org/), an amazing port of CPython to WebAssembly with [Emscripten](https://emscripten.org/). It currently runs Python 3.10.2 with built-in modules. Glide runs Pyodide in a Web Worker as an isolated environment, and also to prevent tab hangs in case a bad recursive code is run. It also "unloads" several JavaScript functions from the interpreter's environment to prevent interpreted codes from usurping the app environment. It uses [Xterm.js](https://xtermjs.org/) as the terminal emulator, the same one used by Visual Studio Code, that has a very good buffer management system (again, to guard against bad recursive codes).
 
+## Deploying on Safe Exam Browser (SEB)
+
+Glide may load resources from other origins, hence you'll need to add these entries in your [URL filtering table in your SEB configuration](https://safeexambrowser.org/windows/win_usermanual_en.html#NetworkPaneFilterSection).
+
+| Active | Regex | Expression | Action | Explanation |
+| ------ | ----- | ---------- | ------ | ----------- |
+| ✓ | ✓ | `^blob:https:\/\/www\.comp\.nus\.edu\.sg\/` | allow | Allows Glide to handle in-browser objects. |
+| ✓ |   | `cdn.jsdelivr.net/npm/monaco-editor*` | allow | Allows Glide to load the JavaScript modules required for the code editor. |
+
+When someone uploads a file to Glide, it needs to create a URL of the uploaded object to refer to it from the browser's internal storage. That file (blob) is then given an object URL that looks like `blob:https://www.comp.nus.edu.sg/acf0114a-5131-4dc8-b697-9c1d21abb020`. The first regex whitelists this.
+
+The second regex whitelists the [jsDelivr CDN](https://www.jsdelivr.com/) that hosts the JavaScript package of [the code editor that Glide uses](https://github.com/microsoft/monaco-editor).
+
 ## Contributing
 
 Glide is a [React app](https://react.dev/), transpiled with [Babel](https://babeljs.io/), and built with [webpack](https://webpack.js.org/). If you encounter bugs or have any questions, feel free to [open an issue](https://github.com/NUSSOC/glide/issues/new). Otherwise, you can always suggest code changes instead.
