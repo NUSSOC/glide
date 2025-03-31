@@ -19,7 +19,7 @@
     "localforage": "^1.10.0",
     "monaco-editor": "^0.52.2",
     "pyodide": "^0.22.1",
-    "react": "^19.0.0",
+    "react": "^19.1.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-split": "^2.0.14",
