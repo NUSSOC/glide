@@ -28,20 +28,22 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
 
     if (isMod && e.key === 's') {
       e.preventDefault();
+      e.stopPropagation();
 
       const content = ref.current?.getValue();
       if (content !== undefined) props.onSave(content);
     }
 
-    if (e.key === 'F5') {
+    if (e.key === 'F5' || (isMod && e.key === 'Enter')) {
       e.preventDefault();
+      e.stopPropagation();
       saveThenRunCode();
     }
   };
 
   useEffect(() => {
-    window.addEventListener('keydown', handleShortcut);
-    return () => window.removeEventListener('keydown', handleShortcut);
+    window.addEventListener('keydown', handleShortcut, true);
+    return () => window.removeEventListener('keydown', handleShortcut, true);
   }, [handleShortcut]);
 
   const saveThenRunCode = () => {
@@ -73,7 +75,7 @@ const CoreEditor = (props: CoreEditorProps): JSX.Element => {
         <div className="absolute bottom-3 right-3 space-x-2">
           <Button icon={PlayIcon} onClick={saveThenRunCode}>
             Run
-            <K className="ml-2 text-blue-900/60 ring-blue-900/60" of="F5" />
+            <K className="ml-2 text-blue-900/60 ring-blue-900/60" of="Mod+Enter" />
           </Button>
         </div>
       )}
